@@ -1,0 +1,3604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#ff0099">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="pink-translucent">
+<meta name="description" content="Indshi AI - India Turns Pink Breast Cancer Awareness Assistant">
+<title>Indshi AI | India Turns Pink</title>
+<link rel="icon" href="app-favicon.jpg" type="image/jpeg">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --pink-deep: #ff0099;
+  --pink: #ff0099;
+  --pink-light: #F8BBD0;
+  --pink-soft: #FCE4EC;
+  --pink-glow: #ff66b3;
+  --pink-pale: #FFF0F5;
+  --rose: #ff0099;
+  --white: #FFFFFF;
+  --gold: #FFD700;
+  --dark: #4A0E2E;
+  --text: #5D2A4E;
+  --text-light: #8E5A7A;
+  --green: #4CAF50;
+  --shadow-pink: 0 8px 32px rgba(255,0,153,0.15);
+  --shadow-soft: 0 4px 20px rgba(255,0,153,0.08);
+  --radius: 20px;
+  --grad-pink: linear-gradient(135deg, #ff0099, #ff4081, #ff66b3);
+  --grad-heaven: linear-gradient(180deg, #fff5fa 0%, #ffe6f5 30%, #ffd6ee 100%);
+  --grad-card: linear-gradient(135deg, #FFFFFF, #FFF5F8);
+}
+
+html, body {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  background: #fff5fa;
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Floating petals background */
+.petals-bg { display:none; }
+.petal { position:absolute; width:20px; height:20px; background:rgba(248,187,208,0.5); border-radius:150% 0 150% 0; animation:fall linear infinite; }
+@keyframes fall {
+  0% { transform:translateY(-10vh) translateX(0) rotate(0deg); opacity:0; }
+  10% { opacity:0.7; }
+  90% { opacity:0.5; }
+  100% { transform:translateY(110vh) translateX(50px) rotate(360deg); opacity:0; }
+}
+
+/* ========= SPLASH SCREEN ========= */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #ff0099 0%, #ff4081 25%, #ff66b3 50%, #cc0099 75%, #990066 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#splash.hide { opacity:0; transform:scale(1.1); pointer-events:none; }
+.splash-logo {
+  width:120px; height:120px; border-radius:50%; object-fit:cover;
+  box-shadow: 0 0 40px rgba(255,255,255,0.5);
+  animation: pulse-logo 3s ease-in-out infinite;
+  z-index:1;
+}
+@keyframes pulse-logo {
+  0% { transform: scale(0.5); opacity: 0; box-shadow:0 0 20px rgba(255,255,255,0.2); }
+  30% { transform: scale(1); opacity: 1; box-shadow:0 0 50px rgba(255,255,255,0.6); }
+  50% { transform: scale(1.05); box-shadow:0 0 70px rgba(255,255,255,0.8); }
+  70% { transform: scale(1); opacity: 1; box-shadow:0 0 50px rgba(255,255,255,0.6); }
+  100% { transform: scale(0.8); opacity: 0; box-shadow:0 0 20px rgba(255,255,255,0.2); }
+}
+.splash-text {
+  margin-top:28px; color:#fff; text-align:center; z-index:1;
+  opacity:0; animation: fadeUp 1s 0.8s forwards;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.splash-title { font-family:'Bricolage Grotesque'; font-size:28px; font-weight:700; letter-spacing:1px; }
+.splash-sub { font-size:14px; opacity:0.9; margin-top:6px; font-weight:300; }
+.splash-welcome {
+  margin-top:16px; font-size:16px; color:#FFEB3B; font-weight:500;
+  font-style:italic; opacity:0; animation:fadeUp 1s 1.6s forwards;
+}
+
+/* ========= APP CONTAINER ========= */
+#app { display:none; position:relative; z-index:1; }
+#app.show { display:block; animation: appIn 0.6s ease; }
+@keyframes appIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ========= HEADER ========= */
+.header {
+  position: sticky; top:0; z-index:100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 2px 20px rgba(255,0,153,0.12);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-left { display:flex; align-items:center; gap:10px; }
+.header-logo { width:40px; height:40px; border-radius:50%; object-fit:cover; box-shadow:0 2px 8px rgba(255,0,153,0.2); }
+.header-title { font-family:'Bricolage Grotesque'; font-size:18px; font-weight:700; color:var(--pink-deep); }
+.header-title span { color:var(--text-light); font-size:12px; font-weight:400; display:block; }
+.header-badge {
+  background: var(--grad-pink); color:#fff; padding:6px 14px; border-radius:30px;
+  font-size:11px; font-weight:600; box-shadow:var(--shadow-pink);
+}
+
+/* ========= SECTIONS ========= */
+.section { display:none; padding:0 16px 80px 16px; margin-top:0; }
+.section.active { display:block; }
+@keyframes secIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
+
+.section-title { font-family:'Bricolage Grotesque'; font-size:24px; font-weight:700; letter-spacing:-0.5px; color:var(--pink-deep); margin-bottom:4px; padding-top:8px; }
+.section-sub { font-size:13px; color:var(--text-light); margin-bottom:12px; margin-top:0; }
+
+/* ========= HOME ========= */
+.hero {
+  background: var(--grad-pink); border-radius: var(--radius); padding:24px 20px;
+  color:#fff; text-align:center; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-pink);
+}
+.hero::before {
+  content:''; position:absolute; top:-30px; right:-30px;
+  width:120px; height:120px; background:rgba(255,255,255,0.15); border-radius:50%;
+}
+.hero::after {
+  content:''; position:absolute; bottom:-40px; left:-20px;
+  width:100px; height:100px; background:rgba(255,255,255,0.1); border-radius:50%;
+}
+.hero h2 { font-family:'Bricolage Grotesque'; font-size:20px; font-weight:700; position:relative; z-index:1; }
+.hero p { font-size:13px; opacity:0.9; margin-top:6px; position:relative; z-index:1; }
+
+/* Indshi character card */
+.indshi-card {
+  background: var(--grad-card); border-radius: var(--radius);
+  padding: 20px; margin-top:16px; display:flex; gap:16px; align-items:center;
+  box-shadow: var(--shadow-soft); position:relative; overflow:hidden;
+}
+.indshi-img {
+  width:100px; height:140px; object-fit:contain; flex-shrink:0;
+  filter: drop-shadow(0 4px 12px rgba(255,0,153,0.2));
+  animation: indshi-float 3s ease-in-out infinite;
+}
+@keyframes indshi-float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+.indshi-card-text h3 { font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:17px; }
+.indshi-card-text p { font-size:13px; color:var(--text-light); margin-top:4px; line-height:1.5; }
+.indshi-pose-badge {
+  display:inline-block; margin-top:8px; background:var(--pink-soft); color:var(--pink-deep);
+  padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;
+}
+
+/* Quick action grid */
+.quick-grid {
+  display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-top:16px;
+}
+.quick-item {
+  background: #fff; border-radius:16px; padding:14px 6px; text-align:center;
+  box-shadow: var(--shadow-soft); cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+.quick-item:active { transform: scale(0.92); }
+.quick-item:hover { border-color: var(--pink-light); box-shadow:var(--shadow-pink); }
+.quick-icon { font-size:28px; }
+.quick-label { font-size:10px; font-weight:600; color:var(--text); margin-top:4px; }
+
+/* YouTube section */
+.yt-section { margin-top:20px; }
+.yt-embed {
+  border-radius: var(--radius); overflow:hidden; box-shadow: var(--shadow-pink);
+  background:#000; position:relative; aspect-ratio:16/9;
+}
+.yt-embed iframe { width:100%; height:100%; border:0; }
+
+/* Camp card */
+.camp-card {
+  background: var(--grad-card); border-radius: var(--radius); padding:18px;
+  box-shadow: var(--shadow-soft); margin-bottom:14px;
+  border-left: 5px solid var(--pink);
+  transition: transform 0.3s;
+}
+.camp-card:hover { transform: translateX(4px); }
+.camp-date {
+  display:inline-block; background:var(--pink); color:#fff; padding:4px 12px;
+  border-radius:20px; font-size:12px; font-weight:600;
+}
+.camp-card h4 { font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:16px; margin:8px 0 4px; }
+.camp-card p { font-size:13px; color:var(--text-light); line-height:1.5; }
+.camp-loc { font-size:12px; color:var(--pink); margin-top:6px; font-weight:500; }
+
+/* ========= 3D SELF-EXAM ========= */
+.exam-container { perspective: 1200px; }
+.exam-stage {
+  background: linear-gradient(180deg,#fff,var(--pink-pale));
+  border-radius: var(--radius); padding:24px 16px; text-align:center;
+  box-shadow: var(--shadow-pink); min-height: 340px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.exam-3d-figure {
+  width: 160px; height: 200px; margin: 0 auto 16px;
+  transform-style: preserve-3d;
+  animation: rotate3d 8s linear infinite;
+  position: relative;
+}
+@keyframes rotate3d {
+  0% { transform: rotateY(0deg) rotateX(5deg); }
+  50% { transform: rotateY(180deg) rotateX(-5deg); }
+  100% { transform: rotateY(360deg) rotateX(5deg); }
+}
+/* 3D figure body using CSS shapes */
+.figure-body {
+  width:80px; height:120px; margin:0 auto; position:relative;
+  background: linear-gradient(135deg, #F8BBD0, #E91E63);
+  border-radius: 40px 40px 30px 30px;
+  box-shadow: 0 0 30px rgba(255,0,153,0.3), inset -10px 0 20px rgba(255,0,153,0.3);
+}
+.figure-head {
+  width:50px; height:50px; border-radius:50%;
+  background: linear-gradient(135deg, #F8BBD0, #E91E63);
+  margin:0 auto -10px; position:relative; z-index:2;
+  box-shadow: 0 0 20px rgba(255,0,153,0.3);
+}
+.figure-hand {
+  position:absolute; width:18px; height:70px; border-radius:10px;
+  background: linear-gradient(135deg, #F8BBD0, #E91E63);
+}
+.figure-hand.left { left:-8px; top:40px; transform:rotate(-20deg); animation: armMoveL 3s ease-in-out infinite; }
+.figure-hand.right { right:-8px; top:40px; transform:rotate(20deg); animation: armMoveR 3s ease-in-out infinite; }
+@keyframes armMoveL { 0%,100% { transform:rotate(-20deg); } 50% { transform:rotate(-35deg) translateY(-10px); } }
+@keyframes armMoveR { 0%,100% { transform:rotate(20deg); } 50% { transform:rotate(35deg) translateY(-10px); } }
+
+/* Exam circle indicator */
+.exam-circle {
+  position:absolute; border:3px solid var(--gold); border-radius:50%;
+  animation: scan 2s ease-in-out infinite;
+}
+@keyframes scan {
+  0%,100% { width:20px; height:20px; opacity:0.4; top:50%; left:50%; transform:translate(-50%,-50%); }
+  50% { width:60px; height:60px; opacity:1; top:50%; left:50%; transform:translate(-50%,-50%); }
+}
+
+.exam-step-img {
+  width:320px; max-width:90%; height:auto; max-height:320px; object-fit:contain; margin:10px auto;
+  border-radius:16px; box-shadow:0 4px 20px rgba(255,0,153,0.15);
+  border:2px solid var(--pink-light); background:#fff;
+  animation: imgFade 0.5s ease;
+}
+@keyframes imgFade { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+.exam-step-text {
+  font-family:'Bricolage Grotesque'; font-size:18px; font-weight:700; color:var(--pink-deep);
+}
+.exam-desc { font-size:14px; color:var(--text-light); margin-top:8px; line-height:1.6; max-width:300px; }
+.exam-nav { display:flex; gap:12px; justify-content:center; margin-top:20px; }
+.exam-btn {
+  background: var(--grad-pink); color:#fff; border:none; padding:10px 24px;
+  border-radius:30px; font-size:14px; font-weight:600; cursor:pointer;
+  box-shadow: var(--shadow-pink); transition: transform 0.2s;
+}
+.exam-btn:active { transform: scale(0.92); }
+.exam-btn.secondary { background:#fff; color:var(--pink-deep); border:2px solid var(--pink-light); box-shadow:none; }
+.exam-dots { display:flex; gap:6px; justify-content:center; margin-top:14px; }
+.exam-dot { width:8px; height:8px; border-radius:50%; background:var(--pink-light); transition: all 0.3s; }
+.exam-dot.active { background:var(--pink); width:24px; border-radius:4px; }
+
+/* ========= DONATE ========= */
+.donate-hero {
+  background: var(--grad-pink); border-radius:var(--radius); padding:24px;
+  text-align:center; color:#fff; box-shadow: var(--shadow-pink);
+}
+.donate-hero h2 { font-family:'Bricolage Grotesque'; font-size:22px; }
+.donate-hero p { font-size:13px; opacity:0.9; margin-top:6px; }
+.donate-amounts { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+.donate-amt {
+  flex:1; min-width:80px; background:#fff; border:2px solid var(--pink-light);
+  border-radius:14px; padding:14px 8px; text-align:center; cursor:pointer;
+  transition: all 0.2s; font-weight:700; color:var(--pink-deep);
+}
+.donate-amt.active { background:var(--pink); color:#fff; border-color:var(--pink); transform:scale(1.05); }
+.donate-amt small { display:block; font-size:10px; font-weight:400; opacity:0.8; margin-top:2px; }
+.donate-btn {
+  width:100%; background: var(--grad-pink); color:#fff; border:none;
+  padding:16px; border-radius:14px; font-size:16px; font-weight:700;
+  margin-top:16px; cursor:pointer; box-shadow: var(--shadow-pink);
+  transition: transform 0.2s;
+}
+.donate-btn:active { transform: scale(0.96); }
+.donate-info { font-size:12px; color:var(--text-light); text-align:center; margin-top:10px; }
+
+/* ========= BOOKING ========= */
+.booking-form { background:var(--grad-card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-soft); }
+.form-group { margin-bottom:14px; }
+.form-group label { font-size:13px; font-weight:600; color:var(--pink-deep); display:block; margin-bottom:6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width:100%; padding:12px 14px; border:2px solid var(--pink-light); border-radius:12px;
+  font-family:'Bricolage Grotesque'; font-size:14px; background:#fff; color:var(--text);
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline:none; border-color:var(--pink);
+}
+.booking-btn {
+  width:100%; background:var(--grad-pink); color:#fff; border:none; padding:16px;
+  border-radius:14px; font-size:15px; font-weight:700; cursor:pointer;
+  box-shadow:var(--shadow-pink); transition:transform 0.2s;
+}
+.booking-btn:active { transform:scale(0.96); }
+.booking-note { background:var(--pink-soft); border-radius:12px; padding:12px; font-size:12px; color:var(--pink-deep); margin-top:14px; line-height:1.5; }
+
+/* ========= ENGAGE ========= */
+.engage-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.engage-card {
+  background:var(--grad-card); border-radius:16px; padding:18px 14px; text-align:center;
+  box-shadow:var(--shadow-soft); cursor:pointer; transition:transform 0.2s;
+}
+.engage-card:active { transform:scale(0.95); }
+.engage-icon { font-size:32px; }
+.engage-card h4 { font-family:'Bricolage Grotesque'; font-size:14px; color:var(--pink-deep); margin:8px 0 4px; }
+.engage-card p { font-size:11px; color:var(--text-light); line-height:1.4; }
+
+.story-card {
+  background:#fff; border-radius:var(--radius); padding:16px; margin-bottom:12px;
+  box-shadow:var(--shadow-soft); border-left:4px solid var(--pink);
+}
+.story-card .story-quote { font-size:13px; color:var(--text); font-style:italic; line-height:1.6; }
+.story-card .story-name { font-size:12px; font-weight:600; color:var(--pink-deep); margin-top:8px; }
+
+.pledge-box {
+  background:var(--grad-pink); border-radius:var(--radius); padding:20px; text-align:center;
+  color:#fff; box-shadow:var(--shadow-pink); margin-top:16px;
+}
+.pledge-count { font-size:36px; font-weight:800; font-family:'Bricolage Grotesque'; }
+.pledge-btn { background:#fff; color:var(--pink-deep); border:none; padding:10px 24px; border-radius:30px; font-weight:700; font-size:14px; margin-top:10px; cursor:pointer; }
+
+/* ========= CHAT (INDSHI AI) ========= */
+.chat-fab {
+  position:fixed; bottom:100px; right:16px; z-index:200;
+  width:60px; height:60px; border-radius:50%;
+  background:var(--grad-pink); border:none; cursor:pointer;
+  box-shadow: 0 4px 20px rgba(255,0,153,0.4);
+  display:flex; align-items:center; justify-content:center;
+  animation: chatPulse 2s infinite;
+}
+@keyframes chatPulse { 0%,100% { box-shadow:0 4px 20px rgba(255,0,153,0.4); } 50% { box-shadow:0 4px 30px rgba(255,0,153,0.7); } }
+.chat-fab img { width:44px; height:44px; border-radius:50%; object-fit:cover; }
+.chat-fab-badge {
+  position:absolute; top:0; right:0; width:16px; height:16px; background:#4CAF50;
+  border-radius:50%; border:2px solid #fff;
+}
+
+.chat-overlay {
+  position:fixed; inset:0; z-index:300; background:rgba(74,14,46,0.5);
+  backdrop-filter:blur(4px); display:none; opacity:0; transition:opacity 0.3s;
+}
+.chat-overlay.show { display:flex; opacity:1; align-items:flex-end; justify-content:center; }
+.chat-panel {
+  background:var(--grad-heaven); width:100%; max-width:480px; height:85vh;
+  border-radius:24px 24px 0 0; display:flex; flex-direction:column;
+  box-shadow:0 -4px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.chat-header {
+  background:var(--grad-pink); padding:14px 16px; border-radius:24px 24px 0 0;
+  display:flex; align-items:center; gap:10px; color:#fff;
+}
+.chat-header img { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #fff; }
+.chat-header h4 { font-family:'Bricolage Grotesque'; font-size:16px; }
+.chat-header small { font-size:11px; opacity:0.85; display:flex; align-items:center; gap:4px; }
+.chat-header .close-chat { margin-left:auto; background:rgba(255,255,255,0.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; }
+.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.chat-bubble { max-width:80%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.5; }
+.chat-bubble.bot { background:#fff; color:var(--text); border-bottom-left-radius:4px; box-shadow:var(--shadow-soft); align-self:flex-start; }
+.chat-bubble.user { background:var(--pink); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
+.chat-bubble a { color:var(--pink-deep); text-decoration:underline; }
+.chat-typing { display:flex; gap:4px; padding:10px 14px; background:#fff; border-radius:16px; border-bottom-left-radius:4px; align-self:flex-start; box-shadow:var(--shadow-soft); }
+.chat-typing span { width:8px; height:8px; background:var(--pink-light); border-radius:50%; animation: typing 1.4s infinite; }
+.chat-typing span:nth-child(2) { animation-delay:0.2s; }
+.chat-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typing { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-6px); opacity:1; } }
+.chat-input-area { padding:12px; background:#fff; border-top:1px solid var(--pink-soft); display:flex; gap:8px; }
+.chat-input-area input { flex:1; padding:12px 16px; border:2px solid var(--pink-light); border-radius:24px; font-family:'Bricolage Grotesque'; font-size:14px; }
+.chat-input-area input:focus { outline:none; border-color:var(--pink); }
+.chat-send { background:var(--grad-pink); color:#fff; border:none; width:44px; height:44px; border-radius:50%; cursor:pointer; font-size:18px; box-shadow:var(--shadow-pink); }
+.chat-suggestions { display:flex; gap:8px; padding:0 12px 8px; flex-wrap:wrap; }
+.chat-sug { background:var(--pink-soft); color:var(--pink-deep); border:none; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; }
+
+/* ========= BOTTOM NAV ========= */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:150;
+  background:rgba(255,255,255,0.95); backdrop-filter:blur(16px);
+  box-shadow:0 -2px 20px rgba(255,0,153,0.1);
+  display:flex; justify-content:space-around; padding:8px 4px;
+}
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:4px 8px; border-radius:12px; transition: all 0.2s; border:none; background:none; }
+.nav-item.active { background:var(--pink-soft); }
+.nav-item .nav-icon { font-size:22px; transition:transform 0.2s; }
+.nav-item.active .nav-icon { transform:scale(1.15); }
+.nav-item .nav-label { font-size:10px; font-weight:600; color:var(--text-light); }
+.nav-item.active .nav-label { color:var(--pink-deep); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:110px; left:50%; transform:translateX(-50%);
+  background:var(--pink-deep); color:#fff; padding:12px 24px; border-radius:30px;
+  font-size:13px; z-index:500; opacity:0; transition:opacity 0.3s, transform 0.3s;
+  pointer-events:none; box-shadow:var(--shadow-pink);
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(-4px); }
+
+/* Helper */
+.card { background:var(--grad-card); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow-soft); margin-bottom:14px; }
+.tag { display:inline-block; background:var(--pink-soft); color:var(--pink-deep); padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; margin-right:4px; }
+.logo-small { width:24px; height:24px; border-radius:50%; object-fit:cover; vertical-align:middle; }
+
+.notif-toast {
+  position: fixed; bottom: 100px; left: 16px; right: 16px; z-index: 400;
+  background: linear-gradient(135deg, #ff0099, #ff66b3);
+  border-radius: 20px; padding: 16px;
+  box-shadow: 0 8px 32px rgba(255,0,153,0.3);
+  transform: translateY(150%); opacity: 0; pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  display: flex; align-items: center;
+}
+.notif-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.notif-toast.hide { transform: translateY(150%); opacity: 0; pointer-events: none; }
+.notif-content { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+.notif-icon-box { flex-shrink: 0; width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.notif-text { flex: 1; color: #fff; }
+.notif-title { font-weight: 700; font-size: 15px; }
+.notif-desc { font-size: 12px; opacity: 0.9; margin-top: 4px; line-height: 1.4; }
+.notif-actions { display: flex; gap: 8px; margin-top: 10px; }
+.notif-btn-primary { background: #fff; color: #ff0099; border: none; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.notif-btn-secondary { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+.notif-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+
+/* ===== NEW HOMEPAGE DESIGN ===== */
+.hero-card-new {
+  display:flex; align-items:center; gap:12px;
+  background: linear-gradient(135deg, #fff0f5 0%, #ffe6f5 100%);
+  border-radius:24px; padding:20px 16px; margin-bottom:16px;
+  box-shadow: 0 4px 20px rgba(255,0,153,0.08);
+}
+.hero-content { flex:1; }
+.hero-pill {
+  display:inline-block; background:var(--pink-soft); color:var(--pink-deep);
+  padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; margin-bottom:8px;
+}
+.hero-headline { font-family:'Bricolage Grotesque'; font-size:20px; font-weight:700; color:#333; line-height:1.3; }
+.hero-highlight { color:var(--pink-deep); }
+.hero-subtext { font-size:12px; color:var(--text-light); margin:6px 0 10px; line-height:1.4; }
+.hero-cta {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--pink-deep); color:#fff; border:none;
+  padding:8px 16px; border-radius:24px; font-size:13px; font-weight:600;
+  cursor:pointer; box-shadow:0 4px 12px rgba(255,0,153,0.25);
+}
+.hero-avatar { width:90px; height:120px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 4px 8px rgba(255,0,153,0.15)); }
+
+.qa-grid { display:flex; gap:8px; margin-bottom:16px; }
+.qa-item {
+  flex:1; background:#fff; border-radius:14px; padding:12px 4px;
+  text-align:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  transition:transform 0.2s;
+}
+.qa-item:active { transform:scale(0.92); }
+.qa-icon-wrap {
+  width:40px; height:40px; margin:0 auto 6px;
+  background:var(--pink-soft); border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.qa-label { font-size:9px; font-weight:600; color:var(--text); }
+
+.dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.dash-card { background:#fff; border-radius:16px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); display:flex; flex-direction:column; }
+.dash-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.dash-title { font-size:12px; font-weight:600; color:var(--text); }
+
+.risk-gauge { position:relative; width:80px; height:44px; margin:4px auto; }
+.risk-arc {
+  width:80px; height:40px; border-radius:80px 80px 0 0;
+  background: linear-gradient(90deg, #4CAF50 0%, #FFEB3B 50%, #F44336 100%);
+  overflow:hidden;
+}
+.risk-pointer { position:absolute; bottom:-2px; left:20%; width:4px; height:24px; background:#fff; border-radius:2px; box-shadow:0 0 4px rgba(0,0,0,0.2); }
+.risk-label { text-align:center; font-weight:700; font-size:14px; color:var(--pink-deep); font-family:'Bricolage Grotesque'; }
+.risk-tip { font-size:10px; color:var(--text-light); text-align:center; margin:4px 0 6px; line-height:1.3; }
+.dash-link { font-size:11px; color:var(--pink-deep); font-weight:600; text-align:center; text-decoration:none; }
+
+.reminder-icon-box { width:40px; height:40px; border-radius:10px; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; margin:4px 0 6px; }
+.reminder-text { font-size:11px; color:var(--text-light); line-height:1.4; margin-bottom:8px; }
+.dash-btn {
+  width:100%; background:var(--pink-deep); color:#fff; border:none;
+  padding:8px; border-radius:10px; font-size:11px; font-weight:600; cursor:pointer;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, #fff5fa, #ffe6f5);
+  border-radius:16px; padding:16px; margin-bottom:16px;
+}
+.insight-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.insight-title { font-size:13px; font-weight:700; color:var(--pink-deep); }
+.insight-body { display:flex; align-items:flex-start; gap:8px; }
+.insight-quote-mark { font-size:36px; color:var(--pink-light); line-height:0.8; font-family:Georgia; flex-shrink:0; }
+.insight-text { font-size:13px; color:var(--text); line-height:1.5; flex:1; }
+.insight-ribbon { flex-shrink:0; opacity:0.3; }
+
+.support-banner {
+  display:flex; align-items:center; gap:12px;
+  background: linear-gradient(135deg, var(--pink-deep), var(--pink-glow));
+  border-radius:16px; padding:16px; margin-bottom:16px;
+}
+.support-icon-box { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.support-text { flex:1; color:#fff; }
+.support-text h4 { font-size:14px; font-weight:700; }
+.support-text p { font-size:11px; opacity:0.9; margin-top:2px; }
+.support-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  background:#fff; color:var(--pink-deep); border:none;
+  padding:8px 14px; border-radius:20px; font-size:11px; font-weight:700;
+  cursor:pointer; flex-shrink:0;
+}
+
+/* ===== NEW HEADER ===== */
+.header-new {
+  position: sticky; top:0; z-index:100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 8px rgba(255,0,153,0.06);
+  padding: 8px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 52px;
+}
+.header-menu-btn { background:none; border:none; cursor:pointer; padding:4px; display:flex; }
+.header-center { display:flex; flex-direction:column; align-items:center; gap:0; flex:1; }
+.header-logo-text { font-family:'Bricolage Grotesque'; font-size:20px; font-weight:700; color:var(--pink-deep); line-height:1.1; }
+.header-tagline { font-size:9px; color:#999; }
+.header-notif-btn { background:none; border:none; cursor:pointer; padding:4px; position:relative; display:flex; }
+.notif-badge {
+  position:absolute; top:-2px; right:-2px; background:#F44336; color:#fff;
+  font-size:9px; font-weight:700; min-width:16px; height:16px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; padding:0 4px;
+}
+
+/* ===== SLIDE-OUT MENU ===== */
+.menu-overlay {
+  position: fixed; inset:0; z-index:250; background:rgba(0,0,0,0.4);
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+.menu-overlay.show { opacity:1; pointer-events:auto; }
+.side-menu {
+  position: fixed; top:0; left:0; bottom:0; z-index:300; width:280px;
+  background:#fff; box-shadow:4px 0 30px rgba(0,0,0,0.15);
+  transform:translateX(-100%); transition:transform 0.3s ease;
+ overflow-y:auto;
+}
+.side-menu.show { transform:translateX(0); }
+.menu-header { display:flex; align-items:center; gap:12px; padding:20px 16px; background:linear-gradient(135deg, var(--pink-deep), var(--pink-glow)); }
+.menu-header img { width:48px; height:48px; border-radius:12px; object-fit:cover; }
+.menu-header h4 { color:#fff; font-family:'Bricolage Grotesque'; font-size:17px; }
+.menu-header small { color:rgba(255,255,255,0.85); font-size:12px; }
+.menu-items { padding:8px 0; }
+.menu-link {
+  display:flex; align-items:center; gap:12px; width:100%;
+  padding:12px 20px; background:none; border:none; cursor:pointer;
+  font-family:'Bricolage Grotesque'; font-size:14px; color:var(--text); text-align:left;
+  transition:background 0.2s;
+}
+.menu-link:hover, .menu-link:active { background:var(--pink-soft); }
+.menu-link svg { color:var(--pink-deep); flex-shrink:0; }
+.menu-divider { height:1px; background:#eee; margin:8px 20px; }
+.menu-contact { padding:12px 20px; font-size:13px; color:var(--text-light); }
+.menu-contact p { margin:2px 0; }
+
+/* ===== NEW BOTTOM NAV ===== */
+.bottom-nav-new {
+  position:fixed; bottom:0; left:0; right:0; z-index:150;
+  background:rgba(255,255,255,0.97); backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 -2px 12px rgba(255,0,153,0.08);
+  display:flex; justify-content:space-evenly; align-items:flex-end;
+  padding:6px 8px; padding-bottom:max(6px, env(safe-area-inset-bottom));
+  min-height:60px;
+}
+.nav-new-item {
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  background:none; border:none; cursor:pointer; padding:6px 12px; border-radius:12px;
+  transition:all 0.2s; color:#999; flex:1; max-width:80px;
+}
+.nav-new-item span { font-size:10px; font-weight:600; font-family:'Bricolage Grotesque'; }
+.nav-new-item.active { color:var(--pink-deep); }
+.nav-new-item.active svg { stroke:var(--pink-deep); }
+.nav-new-item.active span { color:var(--pink-deep); }
+.nav-new-center {
+  width:56px; height:56px; border-radius:50%; cursor:pointer;
+  margin-top:-20px; border:3px solid #fff; box-shadow:0 4px 16px rgba(255,0,153,0.3);
+  overflow:hidden; background:var(--pink-soft); flex-shrink:0;
+}
+.nav-new-center img { width:100%; height:100%; object-fit:cover; }
+
+
+/* ===== GENERAL FONT SIZING ===== */
+p { font-size: 14px; line-height: 1.5; }
+h1, h2, h3, h4, h5 { font-family: 'Bricolage Grotesque'; letter-spacing: -0.3px; }
+.card { border-radius: 16px; }
+.card h4 { font-size: 16px; font-weight: 700; }
+input, select, textarea { font-family: 'Bricolage Grotesque'; }
+button { font-family: 'Bricolage Grotesque'; }
+
+
+/* ===== GUEST LOCK ===== */
+.guest-lock-overlay {
+  text-align: center; padding: 40px 20px;
+}
+.guest-lock-icon {
+  width: 64px; height: 64px; margin: 0 auto 16px;
+  background: var(--pink-soft); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.guest-lock-title {
+  font-family: 'Bricolage Grotesque'; font-size: 18px; font-weight: 700;
+  color: var(--pink-deep); margin-bottom: 8px;
+}
+.guest-lock-msg {
+  font-size: 14px; color: var(--text-light); line-height: 1.5;
+  max-width: 280px; margin: 0 auto 20px;
+}
+
+/* ===== V8 FEATURE STYLES ===== */
+.lang-selector { display:flex; gap:8px; padding:8px 16px; }
+.lang-btn { padding:6px 14px; border-radius:20px; border:2px solid var(--pink-light); background:#fff; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; }
+.lang-btn.active { background:var(--pink-deep); color:#fff; border-color:var(--pink-deep); }
+.live-mic-btn { width:100px; height:100px; border-radius:50%; border:none; background:linear-gradient(135deg, var(--pink-deep), var(--pink-glow)); cursor:pointer; box-shadow:0 8px 32px rgba(255,0,153,0.3); display:flex; align-items:center; justify-content:center; margin:20px auto; transition:all 0.3s; }
+.live-mic-btn.listening { animation: livePulse 1.5s ease-in-out infinite; }
+.live-mic-btn.speaking { animation: liveSpeak 1s ease-in-out infinite; }
+@keyframes livePulse { 0%,100% { transform:scale(1); box-shadow:0 8px 32px rgba(255,0,153,0.3); } 50% { transform:scale(1.15); box-shadow:0 8px 50px rgba(255,0,153,0.5); } }
+@keyframes liveSpeak { 0%,100% { transform:scale(1); } 50% { transform:scale(1.08); } }
+.live-transcript { background:#fff; border-radius:16px; padding:16px; margin:16px 0; min-height:60px; font-size:14px; color:var(--text); text-align:left; box-shadow:var(--shadow-soft); }
+.live-controls { display:flex; gap:12px; justify-content:center; margin:16px 0; }
+.live-ctrl-btn { background:#fff; border:2px solid var(--pink-light); border-radius:30px; padding:8px 20px; font-size:13px; font-weight:600; color:var(--pink-deep); cursor:pointer; }
+.live-ctrl-btn.danger { background:#F44336; color:#fff; border-color:#F44336; }
+.arcade-card { background:#fff; border-radius:16px; padding:20px 14px; text-align:center; box-shadow:var(--shadow-soft); cursor:pointer; transition:transform 0.2s; }
+.arcade-card:active { transform:scale(0.95); }
+.arcade-icon { width:56px; height:56px; border-radius:14px; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+.pink-points-display { display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, var(--pink-deep), var(--pink-glow)); border-radius:16px; padding:12px; margin-bottom:16px; }
+.pink-points-display .pp-num { font-size:28px; font-weight:800; color:#fff; font-family:'Bricolage Grotesque'; }
+.pink-points-display .pp-label { font-size:11px; color:rgba(255,255,255,0.85); }
+.puzzle-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0; }
+.puzzle-cell { aspect-ratio:1; background:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; box-shadow:var(--shadow-soft); border:2px solid transparent; }
+.puzzle-cell.matched { background:var(--green); color:#fff; }
+.puzzle-cell.selected { border-color:var(--pink-deep); background:var(--pink-soft); }
+.wheel-container { position:relative; width:260px; height:260px; margin:20px auto; }
+.wheel-svg { width:100%; height:100%; transition:transform 4s cubic-bezier(0.17,0.67,0.12,0.99); }
+.wheel-pointer { position:absolute; top:-5px; left:50%; transform:translateX(-50%); z-index:10; }
+.period-status { text-align:center; padding:12px; background:var(--pink-soft); border-radius:12px; margin-bottom:12px; }
+.period-day { font-size:32px; font-weight:800; color:var(--pink-deep); font-family:'Bricolage Grotesque'; }
+.period-cal { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:12px 0; }
+.period-cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:11px; border-radius:6px; background:#f5f5f5; color:#999; }
+.period-cal-day.period { background:var(--pink-deep); color:#fff; font-weight:600; }
+.period-cal-day.predicted { background:var(--pink-light); color:#fff; }
+.period-cal-day.today { outline:2px solid var(--pink-deep); }
+.family-member { display:flex; align-items:center; gap:12px; background:#fff; border-radius:16px; padding:14px; box-shadow:var(--shadow-soft); margin-bottom:10px; }
+.family-avatar { width:44px; height:44px; border-radius:50%; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.passport-card { background:linear-gradient(135deg, var(--pink-deep), var(--pink-glow)); border-radius:20px; padding:20px; color:#fff; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(255,0,153,0.2); margin-bottom:16px; }
+.passport-card::before { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:rgba(255,255,255,0.1); border-radius:50%; }
+.challenge-card { background:#fff; border-radius:16px; padding:16px; box-shadow:var(--shadow-soft); margin-bottom:12px; border-left:4px solid var(--pink-deep); }
+.challenge-progress-bar { height:8px; background:#f0f0f0; border-radius:4px; margin:8px 0; overflow:hidden; }
+.challenge-progress-fill { height:100%; background:linear-gradient(90deg, var(--pink-deep), var(--pink-glow)); border-radius:4px; }
+.challenge-day-row { display:flex; gap:4px; margin:8px 0; }
+.challenge-day { flex:1; aspect-ratio:1; border-radius:6px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:10px; color:#999; }
+.challenge-day.done { background:var(--green); color:#fff; }
+.weather-card { display:flex; align-items:center; gap:12px; background:#fff; border-radius:16px; padding:14px; box-shadow:var(--shadow-soft); margin-bottom:16px; }
+.weather-icon { width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #4FC3F7, #29B6F6); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+.notif-center-item { display:flex; align-items:flex-start; gap:10px; background:#fff; border-radius:12px; padding:12px; box-shadow:var(--shadow-soft); margin-bottom:8px; }
+.notif-toggle { width:40px; height:22px; border-radius:11px; background:#ddd; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+.notif-toggle.on { background:var(--pink-deep); }
+.notif-toggle::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left 0.2s; }
+.notif-toggle.on::after { left:20px; }
+.risk-snap-card { border-radius:20px; padding:20px; text-align:center; margin-bottom:16px; }
+.risk-snap-green { background:linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+.risk-snap-orange { background:linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+.home-cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.home-quick-card { background:#fff; border-radius:16px; padding:16px 12px; text-align:center; box-shadow:var(--shadow-soft); cursor:pointer; transition:transform 0.2s; }
+.home-quick-card:active { transform:scale(0.95); }
+.home-quick-card .hqc-icon { width:48px; height:48px; border-radius:12px; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+.home-quick-card h5 { font-family:'Bricolage Grotesque'; font-size:13px; color:var(--pink-deep); }
+.home-quick-card p { font-size:10px; color:var(--text-light); margin-top:2px; }
+
+
+/* ===== AUTH SCREENS ===== */
+.auth-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, #fff0f7, #ffe0f0);
+  z-index: 9999; display: flex; align-items: center; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+.auth-card {
+  background: #fff; border-radius: 24px; padding: 28px 24px;
+  max-width: 380px; width: 100%; box-shadow: 0 8px 40px rgba(255,0,153,0.15);
+  position: relative;
+}
+.auth-logo { text-align: center; margin-bottom: 20px; }
+.auth-logo img { width: 64px; height: 64px; border-radius: 16px; }
+.auth-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; color: var(--pink-deep, #ff0099); text-align: center; }
+.auth-subtitle { font-size: 13px; color: #888; text-align: center; margin-top: 4px; margin-bottom: 20px; }
+.auth-field { margin-bottom: 12px; }
+.auth-field label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 4px; }
+.auth-field input, .auth-field select {
+  width: 100%; padding: 12px 14px; border: 2px solid #f0d0e4; border-radius: 12px;
+  font-size: 14px; outline: none; transition: border-color 0.2s; box-sizing: border-box;
+}
+.auth-field input:focus, .auth-field select:focus { border-color: var(--pink-deep, #ff0099); }
+.auth-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--pink-deep, #ff0099), var(--pink-glow, #ff4dbb));
+  color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.auth-btn:active { transform: scale(0.98); }
+.auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.auth-link { text-align: center; margin-top: 16px; font-size: 13px; color: #555; }
+.auth-link a { color: var(--pink-deep, #ff0099); font-weight: 600; cursor: pointer; text-decoration: none; }
+.auth-error { background: #FFF0F0; color: #D32F2F; border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; display: none; }
+.auth-error.show { display: block; }
+.auth-loading { text-align: center; padding: 20px; font-size: 14px; color: var(--pink-deep, #ff0099); }
+.auth-spinner { width: 36px; height: 36px; border: 3px solid #f0d0e4; border-top-color: var(--pink-deep, #ff0099); border-radius: 50%; animation: authSpin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes authSpin { to { transform: rotate(360deg); } }
+.firebase-warning { background: #FFF3CD; color: #856404; border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; line-height: 1.4; }
+
+</style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  // ========================================
+  // FIREBASE CONFIGURATION
+  // ========================================
+  // IMPORTANT: Replace these placeholder values with your actual Firebase project config.
+  // Go to https://console.firebase.google.com/ → Create Project → Add Web App → Copy config.
+  // Enable: Authentication (Email/Password) and Cloud Firestore.
+  //
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAk_d6jWBOjdY-lKN_-1zgdCiqc88uNty0",
+  authDomain: "indshi-app.firebaseapp.com",
+  projectId: "indshi-app",
+  storageBucket: "indshi-app.firebasestorage.app",
+  messagingSenderId: "160133718785",
+  appId: "1:160133718785:web:69a6f5e3e4849b59183100",
+  measurementId: "G-5HWVKQ2RW8"
+};
+  // Check if config has been filled in
+  var firebaseReady = firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+  if (firebaseReady) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  var db = firebaseReady ? firebase.firestore() : null;
+  var auth = firebaseReady ? firebase.auth() : null;
+</script>
+
+</head>
+<body>
+
+<!-- Petals Background -->
+<div class="petals-bg" id="petalsBg"></div>
+
+<!-- ========= SPLASH SCREEN ========= -->
+<div id="splash">
+  <img class="splash-logo" src="app-favicon.jpg" alt="India Turns Pink">
+  <div class="splash-text">
+    <div class="splash-title">Indshi AI</div>
+    <div class="splash-sub">India Turns Pink</div>
+  </div>
+  <div class="splash-welcome">Welcome to Indshi AI</div>
+</div>
+
+
+<!-- ========= AUTH SCREENS ========= -->
+<div class="auth-overlay" id="authScreen" style="display:none;">
+  <div class="auth-card" id="authCard">
+    <!-- Login View -->
+    <div id="loginView">
+      <div class="auth-logo"><img src="app-favicon.jpg" alt="Indshi"></div>
+      <div class="auth-title">Welcome to Indshi AI</div>
+      <div class="auth-subtitle">India Turns Pink - Breast Health Platform</div>
+      <div class="auth-error" id="loginError"></div>
+      
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Your password">
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+      <div class="auth-link">
+        <a onclick="showForgotPassword()">Forgot Password?</a>
+      </div>
+      <div class="auth-link">
+        Don't have an account? <a onclick="showSignup()">CREATE ACCOUNT</a>
+      </div>
+      <div class="auth-link">
+        <a onclick="guestLogin()" style="font-size:12px; color:#999;">Continue as Guest</a>
+      </div>
+    </div>
+
+    <!-- Signup View -->
+    <div id="signupView" style="display:none;">
+      <div class="auth-logo"><img src="app-favicon.jpg" alt="Indshi"></div>
+      <div class="auth-title">Create Account</div>
+      <div class="auth-subtitle">Join India Turns Pink</div>
+      <div class="auth-error" id="signupError"></div>
+      <div class="auth-field"><label>Full Name *</label><input type="text" id="signupName" placeholder="Your full name"></div>
+      <div class="auth-field"><label>Email Address *</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
+      <div class="auth-field"><label>Password *</label><input type="password" id="signupPassword" placeholder="Min 6 characters"></div>
+      <div class="auth-field"><label>Confirm Password *</label><input type="password" id="signupConfirm" placeholder="Repeat password"></div>
+      <div class="auth-field"><label>Gender *</label>
+        <select id="signupGender">
+          <option value="">Select</option>
+          <option>Female</option>
+          <option>Male</option>
+          <option>Other</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+      <div class="auth-field"><label>Date of Birth *</label><input type="date" id="signupDob"></div>
+      <div class="auth-field"><label>Mobile Number (optional)</label><input type="tel" id="signupMobile" placeholder="+91..."></div>
+      <div class="auth-field"><label>Preferred Language *</label>
+        <select id="signupLang">
+          <option value="en">English</option>
+          <option value="ta">Tamil</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+      <button class="auth-btn" id="signupBtn" onclick="handleSignup()">CREATE ACCOUNT</button>
+      <div class="auth-link">Already have an account? <a onclick="showLogin()">LOGIN</a></div>
+    </div>
+
+    <!-- Forgot Password View -->
+    <div id="forgotView" style="display:none;">
+      <div class="auth-logo"><img src="app-favicon.jpg" alt="Indshi"></div>
+      <div class="auth-title">Reset Password</div>
+      <div class="auth-subtitle">Enter your email to receive a reset link</div>
+      <div class="auth-error" id="forgotError"></div>
+      <div class="auth-field"><label>Email Address</label><input type="email" id="forgotEmail" placeholder="you@example.com"></div>
+      <button class="auth-btn" onclick="handleForgotPassword()">SEND RESET LINK</button>
+      <div class="auth-link"><a onclick="showLogin()">Back to Login</a></div>
+    </div>
+
+    <!-- Loading View -->
+    <div id="authLoading" style="display:none;">
+      <div class="auth-loading">
+        <div class="auth-spinner"></div>
+        <div id="authLoadingText">Please wait...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========= APP ========= -->
+<div id="app">
+  <!-- HEADER (REDESIGNED) -->
+  <div class="header-new">
+    <button class="header-menu-btn" onclick="toggleMenu()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="header-center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg>
+      <span class="header-logo-text">IndShi</span>
+      <span class="header-tagline">AI Assistant for Breast Cancer</span>
+    </div>
+    <button class="header-notif-btn" onclick="showSection('notifcenter')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-badge">1</span>
+    </button>
+  </div>
+
+  <!-- SLIDE-OUT MENU -->
+  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <img src="app-favicon.jpg" alt="Indshi" class="menu-logo">
+      <div>
+        <h4>IndShi AI</h4>
+        <small>India Turns Pink</small>
+      </div>
+    </div>
+    <div class="menu-items">      <div class="lang-selector">
+        <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+        <button class="lang-btn" onclick="setLang('ta',this)">தமிழ்</button>
+        <button class="lang-btn" onclick="setLang('hi',this)">हिन्दी</button>
+      </div>
+      <div class="menu-divider"></div>
+      <button class="menu-link" onclick="toggleMenu();showSection('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Home</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('exam')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Self Examination</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('camps')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Screening Camps</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('book')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 12h.01"/></svg> Doorstep Booking</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('expert')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Talk to Expert</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('awareness')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg> Awareness Program</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('events')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg> Pink Events</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('engage')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 11l3-3 3 3M11 8v8"/></svg> Get Involved</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('donate')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/></svg> Donate</button>
+      <button class="menu-link" onclick="toggleMenu();openChat()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg> Ask Indshi AI</button>
+      <div class="menu-divider"></div>
+      <button class="menu-link" onclick="toggleMenu();showSection('profile')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg> My Profile</button>
+      <button class="menu-link" onclick="toggleMenu();showSection('notifcenter')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Notifications</button>
+      <button class="menu-link" onclick="toggleMenu();handleLogout()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</button>
+      <div class="menu-divider"></div>
+      <div class="menu-contact">
+        <p>+91 9844052030</p>
+        <p>info@indiaturnspink.org</p>
+        <p style="margin-top:6px; font-size:11px; color:#999;">India Turns Pink<br>Breast Cancer Free India 2030</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HOME SECTION (REDESIGNED) ===== -->
+  <div class="section active" id="sec-home">
+        <!-- HERO CARD -->
+    <div class="hero-card-new">
+      <div class="hero-content">
+        <span class="hero-pill">Hello, I'm Indshi</span>
+        <h2 class="hero-headline">Your 24/7 Companion for <span class="hero-highlight">Breast Health</span></h2>
+        <p class="hero-subtext">Trusted information. Real support. Better decisions. Stronger you.</p>
+        <button class="hero-cta" onclick="openChat()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+          Chat with Indshi
+        </button>
+      </div>
+      <img class="hero-avatar" src="indshi-character.png" alt="Indshi AI Assistant">
+    </div>
+
+    <!-- QUICK ACCESS GRID -->
+    <div class="qa-grid">
+      <div class="qa-item" onclick="showSection('exam')">
+        <div class="qa-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <span class="qa-label">Self Check</span>
+      </div>
+      <div class="qa-item" onclick="showSection('camps')">
+        <div class="qa-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></div>
+        <span class="qa-label">Camps</span>
+      </div>
+      <div class="qa-item" onclick="showSection('engage')">
+        <div class="qa-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+        <span class="qa-label">Resources</span>
+      </div>
+      <div class="qa-item" onclick="openChat()">
+        <div class="qa-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg></div>
+        <span class="qa-label">Ask Indshi</span>
+      </div>
+      <div class="qa-item" onclick="showSection('expert')">
+        <div class="qa-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
+        <span class="qa-label">Talk Expert</span>
+      </div>
+    </div>
+
+    <!-- DASHBOARD: Two-column grid -->
+    <div class="dash-grid">
+      <!-- Risk Snapshot -->
+      <div class="dash-card">
+        <div class="dash-header">
+          <span class="dash-title">Your Risk Snapshot</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </div>
+        <div class="risk-gauge">
+          <div class="risk-arc"></div>
+          <div class="risk-pointer"></div>
+        </div>
+        <div class="risk-label">Low Risk</div>
+        <p class="risk-tip">You're doing great! Keep up with regular screenings.</p>
+        <a href="#" class="dash-link" onclick="showSection('exam');return false;">View Details →</a>
+      </div>
+      <!-- Self Check Reminder -->
+      <div class="dash-card">
+        <div class="dash-header">
+          <span class="dash-title">Self Check Reminder</span>
+        </div>
+        <div class="reminder-icon-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#ff0099"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="#fff" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="#fff" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#fff" stroke-width="2"/></svg>
+        </div>
+        <p class="reminder-text">It's been 30 days since your last self-check.</p>
+        <button class="dash-btn" onclick="showSection('exam')">Do Self Check Now →</button>
+      </div>
+    </div>
+
+    <!-- TODAY'S INSIGHT -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <span class="insight-title">Today's Insight</span>
+        <a href="#" class="dash-link" onclick="showSection('engage');return false;">View All →</a>
+      </div>
+      <div class="insight-body">
+        <div class="insight-quote-mark">“</div>
+        <p class="insight-text">When breast cancer is detected early, the 5-year survival rate is <span class="hero-highlight">over 90%</span>.</p>
+        <div class="insight-ribbon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT BANNER -->
+    <div class="support-banner">
+      <div class="support-icon-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="support-text">
+        <h4>We're here for you</h4>
+        <p>Our support team is available 24/7. Anytime, anywhere.</p>
+      </div>
+      <button class="support-btn" onclick="showSection('expert')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff0099"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+        Get Support
+      </button>
+    </div>
+
+    <!-- DAILY WEATHER CARD -->
+    <div class="weather-card">
+      <div class="weather-icon">☀️</div>
+      <div class="weather-info">
+        <div style="font-size:20px; font-weight:700; color:var(--text);">31°C <span style="font-size:13px;color:var(--text-light)">Partly Cloudy</span></div>
+        <div style="font-size:12px; color:var(--text-light);">Chennai</div>
+        <div style="font-size:11px; color:var(--pink-deep); margin-top:2px;">Today's Health Tip: It's a hot day. Remember to stay hydrated.</div>
+      </div>
+    </div>
+    <!-- V8 HOME QUICK CARDS -->
+    <div class="home-cards-grid">
+      <div class="home-quick-card" onclick="showSection('live')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 18v4" fill="none" stroke="#ff0099" stroke-width="2"/></svg></div><h5>Indshi Live</h5><p>Talk to Indshi</p></div>
+      <div class="home-quick-card" onclick="showSection('exam')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h5>Self Check</h5><p>Breast awareness</p></div>
+      <div class="home-quick-card" onclick="showSection('period')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="2" fill="#ff0099"/></svg></div><h5>Period Tracker</h5><p>Follow your cycle</p></div>
+      <div class="home-quick-card" onclick="showSection('arcade')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="4"/><circle cx="8" cy="12" r="2" fill="#ff0099"/><line x1="14" y1="11" x2="18" y2="11"/><line x1="14" y1="13" x2="18" y2="13"/></svg></div><h5>PLAY Arcade</h5><p>Health games</p></div>
+      <div class="home-quick-card" onclick="showSection('challenges')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg></div><h5>Challenges</h5><p>Build healthy habits</p></div>
+      <div class="home-quick-card" onclick="showSection('family')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg></div><h5>Family Circle</h5><p>Family reminders</p></div>
+      <div class="home-quick-card" onclick="showSection('passport')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/></svg></div><h5>Pink Passport</h5><p>Your identity</p></div>
+      <div class="home-quick-card" onclick="showSection('wallet')"><div class="hqc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M16 12h4"/></svg></div><h5>Pink Wallet</h5><p>Rewards & points</p></div>
+    </div>
+
+    <!-- YouTube Section -->
+    <div class="yt-section">
+      <div class="section-title" style="margin-top:20px;">India Turns Pink YouTube</div>
+      <p class="section-sub">Watch awareness videos, survivor stories & self-exam guides</p>
+      <div class="yt-embed">
+        <iframe src="https://www.youtube.com/embed/ImKMZ08StQ8"
+          allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      </div>
+      <div style="text-align:center; margin-top:10px;">
+        <a href="https://www.youtube.com/watch?v=ImKMZ08StQ8" target="_blank" style="color:var(--pink-deep); font-size:13px; font-weight:600;">Open YouTube Channel →</a>
+      </div>
+    </div>
+
+    <!-- Doorstep Screening -->
+    <div class="card" style="margin-top:16px;">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:16px; margin-bottom:8px;">Doorstep Screening</h4>
+      <p style="font-size:13px; color:var(--text-light); line-height:1.5;">Book a free, painless, radiation-free breast cancer screening at your doorstep with the breast cancer screening device. Conducted by trained professionals.</p>
+      <button class="exam-btn" style="margin-top:10px;" onclick="showSection('book')">Book Now</button>
+    </div>
+
+    <div class="card">
+      <img class="logo-small" src="app-favicon.jpg" alt=""> 
+      <span style="font-size:12px; color:var(--text-light);">India's Largest Women Wellness Organisation for Breast Cancer</span>
+    </div>
+  </div>
+
+  <!-- ===== SELF-EXAM SECTION ===== -->
+  <div class="section" id="sec-exam">
+    <div class="section-title">Self-Examination Guide</div>
+    <p class="section-sub">Follow these 5 animated steps every month. Early detection saves lives.</p>
+    <div class="exam-container">
+      <div class="exam-stage">
+        <img class="exam-step-img" id="examImg" src="step1.png" alt="Step 1 illustration">
+
+        <div class="exam-step-text" id="examTitle">Step 1: Visual Check</div>
+        <div class="exam-desc" id="examDesc">Stand before a mirror with arms on hips. Look for any changes in size, shape, skin texture, or nipple position.</div>
+        <div class="exam-dots" id="examDots">
+          <div class="exam-dot active"></div>
+          <div class="exam-dot"></div>
+          <div class="exam-dot"></div>
+          <div class="exam-dot"></div>
+          <div class="exam-dot"></div>
+        </div>
+        <div class="exam-nav">
+          <button class="exam-btn secondary" onclick="examPrev()">← Prev</button>
+          <button class="exam-btn" onclick="examNext()">Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <p style="font-size:13px; color:var(--text-light); line-height:1.6;">
+        <strong style="color:var(--pink-deep);">Important:</strong> This guide is for awareness only and is not a substitute for medical diagnosis. If you notice any changes, consult a doctor immediately. Call India Turns Pink at <strong>+91 9844052030</strong> for free guidance.
+      </p>
+    </div>
+    <div style="text-align:center; margin-top:16px; padding:16px; background:var(--pink-soft); border-radius:16px;">
+      <p style="font-size:14px; color:var(--pink-deep); font-weight:600; margin-bottom:10px;">Finished all 5 steps?</p>
+      <button class="exam-btn" style="width:100%;" onclick="showSection('riskquestion')">COMPLETE SELF CHECK</button>
+    </div>
+  </div>
+
+
+  </div>
+
+  <!-- ===== SELF-CHECK RISK QUESTION ===== -->
+  <div class="section" id="sec-riskquestion">
+    <div class="section-title">Self-Check Result</div>
+    <p class="section-sub">Did you notice anything unusual or different during your self-check?</p>
+    <div class="card" style="text-align:center;">
+      <button class="exam-btn" style="width:100%; margin-bottom:10px;" onclick="showRiskResult('no')">
+        NO - I DIDN'T NOTICE ANYTHING
+      </button>
+      <button class="exam-btn secondary" style="width:100%;" onclick="showRiskResult('yes')">
+        YES - I NOTICED SOMETHING
+      </button>
+    </div>
+  </div>
+
+    <!-- ===== RISK SNAPSHOT ===== -->
+  <div id="riskResult" style="display:none;"></div>
+
+  <!-- ===== CAMPS SECTION ===== -->
+  <div class="section" id="sec-camps">
+    <div class="section-title">Upcoming Screening Camps</div>
+    <p class="section-sub">Free, painless & radiation-free screening near you</p>
+
+    <div class="camp-card">
+      <span class="camp-date">Oct 2026</span>
+      <h4>Pinktober 2026 - 11 Airports (Western Region)</h4>
+      <p>Pinktober 2026 brings 11 airports across India's Western Region going Pink! Month-long free breast cancer screening and awareness in collaboration with Airports Authority of India and Kalyanmayee.</p>
+      <div class="camp-loc">Western Region Airports - 11 airports</div>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Oct 2026</span>
+      <h4>Free Screening at Chennai Airport</h4>
+      <p>Free breast cancer screening throughout October at Chennai International Airport campus. Open to staff, passengers and public.</p>
+      <div class="camp-loc">Chennai International Airport, Tamil Nadu</div>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Sep 2, 2026</span>
+      <h4>Free Screening Camp at Vizag</h4>
+      <p>Free breast cancer screening camp at Visakhapatnam. Non-invasive, painless, radiation-free screening with instant results. Open to all women.</p>
+      <div class="camp-loc">Visakhapatnam (Vizag), Andhra Pradesh</div>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Ongoing</span>
+      <h4>Rural and Urban Mobile Screening Camps</h4>
+      <p>Mobile screening units travelling across India using the breast cancer screening device - non-invasive, painless, radiation-free with instant results.</p>
+      <div class="camp-loc">Across rural and urban India (K2K Drive)</div>
+    </div>
+
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:16px; margin-bottom:6px;">Can't attend a camp?</h4>
+      <p style="font-size:13px; color:var(--text-light);">Book a doorstep screening with the breast cancer screening device. Our trained professionals will come to you.</p>
+      <button class="exam-btn" style="margin-top:10px;" onclick="showSection('book')">Book Doorstep Screening</button>
+    </div>
+  </div>
+
+  <!-- ===== BOOKING SECTION ===== -->
+  <div class="section" id="sec-book">
+    <div class="section-title">Doorstep Screening Booking</div>
+    <p class="section-sub">Free, painless, radiation-free screening with breast cancer screening device at your home</p>
+    <div class="booking-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="bkName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="bkPhone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>City / Town</label>
+        <input type="text" id="bkCity" placeholder="Your city">
+      </div>
+      <div class="form-group">
+        <label>Preferred Date</label>
+        <input type="date" id="bkDate">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea id="bkAddr" rows="2" placeholder="Your full address"></textarea>
+      </div>
+      <button class="booking-btn" onclick="submitBooking()">Confirm Doorstep Booking</button>
+      <div class="booking-note">
+        ⚕ The breast cancer screening device is <strong>non-invasive, painless & 100% radiation-free</strong>. Safe for all age groups. Instant results. Your information is kept strictly confidential.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ENGAGE SECTION ===== -->
+  <div class="section" id="sec-engage">
+    <div class="section-title">Get Involved</div>
+    <p class="section-sub">Join the movement. Every action brings us closer to a breast cancer-free India.</p>
+    <div class="engage-grid">
+      <div class="engage-card" onclick="showSection('stories')">
+        <div class="engage-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/></svg></div>
+        <h4>Survivor Stories</h4>
+        <p>Inspiring journeys of courage</p>
+      </div>
+      <div class="engage-card" onclick="showSection('volunteer')">
+        <div class="engage-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 11l3-3 3 3M11 8v8M3 12l5 5M21 12l-5 5M16 7l3-3M5 4l3 3"/></svg></div>
+        <h4>Volunteer</h4>
+        <p>Be a Pink Warrior</p>
+      </div>
+      <div class="engage-card" onclick="showSection('ambassador')">
+        <div class="engage-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg></div>
+        <h4>Ambassador</h4>
+        <p>Lead in your community</p>
+      </div>
+      <div class="engage-card" onclick="showSection('pledge')">
+        <div class="engage-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11V6a2 2 0 014 0v5M9 11V8a2 2 0 014 0v3M9 11h6a2 2 0 012 2v3a6 6 0 01-12 0v-3z"/></svg></div>
+        <h4>Take a Pledge</h4>
+        <p>Commit to regular screening</p>
+      </div>
+    </div>
+
+    <div class="engage-grid" style="margin-top:12px;">
+      <div class="engage-card" onclick="showSection('expert')">
+        <div class="engage-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <h4>Talk to Expert</h4>
+        <p>Consult a specialist - Rs 199</p>
+      </div>
+      <div class="engage-card" onclick="showSection('awareness')">
+        <div class="engage-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+        <h4>Awareness Program</h4>
+        <p>Request for your organisation</p>
+      </div>
+      <div class="engage-card" onclick="showSection('events')">
+        <div class="engage-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><path d="M9 16l2 2 4-4"/></svg></div>
+        <h4>Pink Events</h4>
+        <p>Walks, webinars & more</p>
+      </div>
+    </div>
+
+    <div class="pledge-box" id="pledgeBox">
+      <div class="pledge-count" id="pledgeCount">10,247</div>
+      <p style="font-size:13px; opacity:0.9;">Women have taken the pledge to screen regularly</p>
+      <button class="pledge-btn" onclick="takePledge()">I Pledge to Screen Regularly</button>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:16px;">📱 Share & Spread Awareness</h4>
+      <p style="font-size:13px; color:var(--text-light); margin-top:6px;">Share the Indshi AI app with your friends and family. One share could save a life.</p>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="exam-btn secondary" style="flex:1;" onclick="shareApp()">Share App</button>
+        <button class="exam-btn" style="flex:1;" onclick="showSection('donate')">Donate ₹365</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TALK TO EXPERT ===== -->
+  <div class="section" id="sec-expert">
+    <div class="section-title">Talk to an Expert</div>
+    <p class="section-sub">Consult qualified healthcare professionals for personalized guidance</p>
+
+    <div class="hero" style="margin-bottom:16px;">
+      <h2 style="font-size:20px;">Consult a Specialist - Rs 199</h2>
+      <p style="margin-top:6px;">Connect with qualified oncologists and breast health specialists. Get professional medical advice tailored to your concerns.</p>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+        <div style="width:56px; height:56px; border-radius:50%; background:var(--pink-soft); display:flex; align-items:center; justify-content:center;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg>
+        </div>
+        <div>
+          <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:17px;">What you get</h4>
+          <p style="font-size:13px; color:var(--text-light); margin-top:2px;">A one-on-one consultation with a breast health specialist.</p>
+        </div>
+      </div>
+      <div style="font-size:13px; color:var(--text); line-height:2;">
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Professional medical advice from qualified oncologists</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Answers to your breast health questions</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Guidance on screening results and next steps</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Confidential and private consultation</div>
+      </div>
+    </div>
+
+    <div class="card" style="border:2px solid var(--pink); text-align:center;">
+      <div style="font-size:36px; font-weight:800; color:var(--pink-deep); font-family:'Bricolage Grotesque';">Rs 199</div>
+      <p style="font-size:13px; color:var(--text-light); margin:4px 0 12px;">per consultation</p>
+      <button class="donate-btn" onclick="bookExpert()">Book Consultation</button>
+      <p style="font-size:11px; color:var(--text-light); margin-top:10px;">
+        <strong style="color:var(--pink-deep);">Note:</strong> This is professional medical advice from a qualified specialist, separate from the Indshi AI assistant which provides general awareness information sourced from Google.
+      </p>
+    </div>
+
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:6px;">How it works</h4>
+      <p style="font-size:13px; color:var(--text-light); line-height:1.6;">
+        1. Fill the consultation request form<br>
+        2. Our team contacts you within 24 hours<br>
+        3. Schedule a phone or video consultation<br>
+        4. Get expert guidance from a qualified specialist<br>
+      </p>
+    </div>
+
+    <div class="booking-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="exName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="exPhone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>Preferred Language</label>
+        <select id="exLang">
+          <option>English</option>
+          <option>Tamil</option>
+          <option>Hindi</option>
+          <option>Telugu</option>
+          <option>Kannada</option>
+          <option>Malayalam</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Your Question / Concern</label>
+        <textarea id="exConcern" rows="3" placeholder="Briefly describe your concern"></textarea>
+      </div>
+      <button class="booking-btn" onclick="submitExpert()">Request Consultation - Rs 199</button>
+      <div class="booking-note">
+        Your information is strictly confidential. A specialist will contact you within 24 hours to schedule your consultation.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REQUEST AWARENESS PROGRAM ===== -->
+  <div class="section" id="sec-awareness">
+    <div class="section-title">Request an Awareness Program</div>
+    <p class="section-sub">Schools, colleges, companies and organisations - bring breast cancer awareness to your community</p>
+
+    <div class="hero" style="margin-bottom:16px;">
+      <h2 style="font-size:20px;">Host a Pink Awareness Program</h2>
+      <p style="margin-top:6px;">India Turns Pink and the Indshi AI team will come to your organisation to conduct an awareness session.</p>
+    </div>
+
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:16px; margin-bottom:10px;">What the program includes</h4>
+      <div style="font-size:13px; color:var(--text); line-height:2;">
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Expert talk on breast cancer awareness</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Live demonstration of self-examination</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Free breast cancer screening (if requested)</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Q&A session with experts</div>
+        <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg> Educational materials for all participants</div>
+      </div>
+    </div>
+
+    <div class="booking-form">
+      <div class="form-group">
+        <label>Organisation Name</label>
+        <input type="text" id="awOrgName" placeholder="School / College / Company name">
+      </div>
+      <div class="form-group">
+        <label>Organisation Type</label>
+        <select id="awType">
+          <option>School</option>
+          <option>College</option>
+          <option>Company / Corporate</option>
+          <option>NGO / Non-profit</option>
+          <option>Government</option>
+          <option>Community Group</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>City / Location</label>
+        <input type="text" id="awCity" placeholder="Your city">
+      </div>
+      <div class="form-group">
+        <label>Expected Number of Participants</label>
+        <input type="number" id="awCount" placeholder="e.g. 200">
+      </div>
+      <div class="form-group">
+        <label>Preferred Month</label>
+        <input type="text" id="awMonth" placeholder="e.g. October 2026">
+      </div>
+      <div class="form-group">
+        <label>Phone / Email</label>
+        <input type="text" id="awContact" placeholder="Phone or email for coordination">
+      </div>
+      <div class="form-group">
+        <label>Additional Details</label>
+        <textarea id="awDetails" rows="3" placeholder="Any specific requirements or topics you'd like covered"></textarea>
+      </div>
+      <button class="booking-btn" onclick="submitAwareness()">Request Awareness Program</button>
+      <div class="booking-note">
+        Our team will contact you within 48 hours to plan the program. Programs can be conducted in-person or as webinars.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PINK EVENTS ===== -->
+  <div class="section" id="sec-events">
+    <div class="section-title">Pink Events</div>
+    <p class="section-sub">Awareness programs, webinars, walks, workplace activities and community events</p>
+
+    <div class="camp-card">
+      <span class="camp-date">Oct 2026</span>
+      <h4>Pinktober 2026 - Pink Ribbon Walk</h4>
+      <p>Annual Pink Ribbon Walk to raise breast cancer awareness. Open to all - students, families, corporates and community members. Walk together, save lives together.</p>
+      <div class="camp-loc">Multiple cities across India</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="registerEvent('Pink Ribbon Walk 2026')">Register Now</button>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Oct 2026</span>
+      <h4>Pinktober Airport Awareness Drive</h4>
+      <p>Month-long awareness drive at 11 Western Region airports. Free screening, flash mobs, mime performances and survivor stories. Open to all passengers and staff.</p>
+      <div class="camp-loc">11 Western Region Airports</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="registerEvent('Airport Awareness Drive 2026')">Register Now</button>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Sep 2, 2026</span>
+      <h4>Vizag Free Screening & Awareness Camp</h4>
+      <p>Free breast cancer screening camp at Visakhapatnam. Includes awareness talk, self-exam demonstration and free screening with the breast cancer screening device. All women welcome.</p>
+      <div class="camp-loc">Visakhapatnam (Vizag), Andhra Pradesh</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="registerEvent('Vizag Screening Camp')">Register Now</button>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Monthly</span>
+      <h4>Indshi AI Webinar Series</h4>
+      <p>Monthly online webinar on breast cancer awareness, early detection and prevention. Expert doctors share insights and answer your questions live. Free to attend.</p>
+      <div class="camp-loc">Online (Zoom / YouTube Live)</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="registerEvent('Indshi Webinar Series')">Register Now</button>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Ongoing</span>
+      <h4>Colleges Turn Pink</h4>
+      <p>Student-led awareness drives in colleges across India. Students become Pink Ambassadors, organize events and spread awareness among peers. Join or start a chapter at your college.</p>
+      <div class="camp-loc">Colleges across India</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="registerEvent('Colleges Turn Pink')">Register Now</button>
+    </div>
+
+    <div class="camp-card">
+      <span class="camp-date">Ongoing</span>
+      <h4>Workplace Wellness Program</h4>
+      <p>India Turns Pink brings breast cancer awareness to your workplace. On-site screening, expert talks and educational sessions for employees. CSR partnerships available.</p>
+      <div class="camp-loc">Offices across India</div>
+      <button class="exam-btn" style="margin-top:10px;" onclick="showSection('awareness')">Request for Your Company</button>
+    </div>
+  </div>
+
+  <!-- ===== INDSHI LIVE ===== -->
+  <div class="section" id="sec-live">
+    <div class="section-title">Indshi Live</div>
+    <p class="section-sub">Talk to Indshi with your voice - natural AI voice conversation</p>
+    <div class="live-screen">
+      <button class="live-mic-btn" id="liveMicBtn" onclick="toggleLiveChat()">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 18v4" fill="none" stroke="#fff" stroke-width="2"/></svg>
+      </button>
+      <div class="live-status" id="liveStatus">Tap to talk to Indshi</div>
+      <div class="live-transcript" id="liveTranscript">
+        <span style="color:#999;">Your conversation will appear here...</span>
+      </div>
+      <div class="live-controls" id="liveControls" style="display:none;">
+        <button class="live-ctrl-btn" onclick="toggleMute()" id="muteBtn">Mute</button>
+        <button class="live-ctrl-btn" onclick="toggleSpeaker()" id="speakerBtn">Speaker On</button>
+        <button class="live-ctrl-btn" onclick="repeatAnswer()">Repeat</button>
+        <button class="live-ctrl-btn danger" onclick="endLiveChat()">End Conversation</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <p style="font-size:12px; color:var(--text-light); line-height:1.5;">
+        <strong style="color:var(--pink-deep);">Note:</strong> Indshi provides health information and guidance and does not replace a doctor. For medical diagnosis or treatment, please consult a qualified healthcare professional.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== PLAY ARCADE ===== -->
+  <div class="section" id="sec-arcade">
+    <div class="section-title">PLAY - Health Arcade</div>
+    <p class="section-sub">Make health education engaging through mini-games and rewards</p>
+    <div class="pink-points-display">
+      <span style="font-size:22px;">🪙</span>
+      <div>
+        <div class="pp-num" id="pinkPoints">120</div>
+        <div class="pp-label">Your Pink Points</div>
+      </div>
+    </div>
+    <p style="font-size:12px; color:var(--text-light); text-align:center; margin-bottom:16px;">Use your Pink Points to shop eligible Pink products at the India Turns Pink Store.</p>
+    <button class="exam-btn" style="width:100%; margin-bottom:16px;" onclick="showSection('wallet')">Shop with Points</button>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="arcade-card" onclick="showSection('puzzle')">
+        <div class="arcade-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></div>
+        <h4>Health Puzzle</h4>
+        <p>Match health facts +10 pts</p>
+      </div>
+      <div class="arcade-card" onclick="showSection('wheel')">
+        <div class="arcade-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v10l7 7"/></svg></div>
+        <h4>Health Wheel</h4>
+        <p>Spin for a health tip</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PUZZLE GAME ===== -->
+  <div class="section" id="sec-puzzle">
+    <div class="section-title">Health Puzzle</div>
+    <p class="section-sub">Match the health fact with the correct answer. Earn 10 Pink Points!</p>
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; text-align:center;" id="puzzleQuestion">Which vitamin helps absorb calcium for bone health?</h4>
+      <div class="puzzle-grid" id="puzzleGrid"></div>
+      <div id="puzzleResult" style="text-align:center; margin-top:12px;"></div>
+      <button class="exam-btn" style="width:100%; margin-top:12px;" onclick="newPuzzle()">New Puzzle</button>
+    </div>
+  </div>
+
+  <!-- ===== HEALTH WHEEL ===== -->
+  <div class="section" id="sec-wheel">
+    <div class="section-title">Health Wheel</div>
+    <p class="section-sub">Spin the wheel to discover a healthy fruit and its benefits!</p>
+    <div class="wheel-container">
+      <div class="wheel-pointer"><svg width="24" height="30" viewBox="0 0 24 30" fill="#ff0099"><polygon points="12,30 0,0 24,0"/></svg></div>
+      <svg class="wheel-svg" id="healthWheel" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#fff" stroke="#ff0099" stroke-width="3"/>
+        <path d="M100,100 L100,5 A95,95 0 0,1 182.3,47.5 Z" fill="#FF6B6B"/><text x="135" y="40" fill="#fff" font-size="10" font-weight="bold">Apple</text>
+        <path d="M100,100 L182.3,47.5 A95,95 0 0,1 182.3,152.5 Z" fill="#FFA94D"/><text x="160" y="105" fill="#fff" font-size="10" font-weight="bold">Orange</text>
+        <path d="M100,100 L182.3,152.5 A95,95 0 0,1 100,195 Z" fill="#69DB7C"/><text x="125" y="180" fill="#fff" font-size="10" font-weight="bold">Guava</text>
+        <path d="M100,100 L100,195 A95,95 0 0,1 17.7,152.5 Z" fill="#FFD43B"/><text x="55" y="180" fill="#fff" font-size="10" font-weight="bold">Papaya</text>
+        <path d="M100,100 L17.7,152.5 A95,95 0 0,1 17.7,47.5 Z" fill="#DA77F2"/><text x="20" y="105" fill="#fff" font-size="9" font-weight="bold">Pomegranate</text>
+        <path d="M100,100 L17.7,47.5 A95,95 0 0,1 100,5 Z" fill="#FF99CC"/><text x="65" y="40" fill="#fff" font-size="10" font-weight="bold">Banana</text>
+      </svg>
+    </div>
+    <div style="text-align:center;">
+      <button class="exam-btn" onclick="spinWheel()" id="spinBtn">SPIN</button>
+    </div>
+    <div class="wheel-result" id="wheelResult" style="display:none;"></div>
+    <div id="wheelCountdown" style="text-align:center; font-size:12px; color:var(--text-light); margin-top:8px;"></div>
+  </div>
+
+  <!-- ===== PERIOD TRACKER ===== -->
+  <div class="section" id="sec-period">
+    <div class="section-title">Period Cycle Tracker</div>
+    <p class="section-sub">Track your cycle privately. Predictions are estimates and can vary.</p>
+    <div class="period-status">
+      <div style="font-size:12px; color:var(--text-light);">Your period may start in approximately</div>
+      <div class="period-day" id="periodCountdown">4 days</div>
+      <div style="font-size:12px; color:var(--text-light);">based on your last recorded cycle</div>
+    </div>
+    <div class="period-card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:8px;">Record Period</h4>
+      <div class="form-group"><label>Start Date</label><input type="date" id="periodStart"></div>
+      <div class="form-group"><label>End Date</label><input type="date" id="periodEnd"></div>
+      <div class="form-group"><label>Cycle Length (days)</label><input type="number" id="cycleLen" placeholder="28" value="28"></div>
+      <div class="form-group"><label>Symptoms</label><select id="periodSymptoms"><option>None</option><option>Cramps</option><option>Headache</option><option>Bloating</option><option>Fatigue</option><option>Mood swings</option></select></div>
+      <div class="form-group"><label>Mood</label><select id="periodMood"><option>Normal</option><option>Happy</option><option>Irritable</option><option>Sad</option><option>Anxious</option></select></div>
+      <div class="form-group"><label>Notes</label><textarea id="periodNotes" rows="2" placeholder="Any notes..."></textarea></div>
+      <button class="booking-btn" onclick="savePeriod()">Save Cycle</button>
+    </div>
+    <div class="card">
+      <p style="font-size:11px; color:var(--text-light);">Period information is private to your account and stored locally on your device.</p>
+    </div>
+  </div>
+
+  <!-- ===== FAMILY CIRCLE ===== -->
+  <div class="section" id="sec-family">
+    <div class="section-title">Family Circle</div>
+    <p class="section-sub">Set health reminders for your family members</p>
+    <div id="familyList">
+      <div class="family-member">
+        <div class="family-avatar">👩</div>
+        <div class="family-info"><h5>Mom</h5><p>Annual health check-up</p><p style="color:var(--pink-deep); font-size:11px;">Next reminder: 15 October</p></div>
+      </div>
+      <div class="family-member">
+        <div class="family-avatar">👧</div>
+        <div class="family-info"><h5>Sister</h5><p>Vaccination reminder</p><p style="color:var(--pink-deep); font-size:11px;">Next reminder: 22 November</p></div>
+      </div>
+    </div>
+    <div class="booking-form" style="margin-top:12px;">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:10px;">Add Family Member</h4>
+      <div class="form-group"><label>Name / Nickname</label><input type="text" id="famName" placeholder="e.g. Mom, Sister"></div>
+      <div class="form-group"><label>Relationship</label><select id="famRel"><option>Mother</option><option>Father</option><option>Sister</option><option>Brother</option><option>Spouse</option><option>Daughter</option><option>Son</option><option>Other</option></select></div>
+      <div class="form-group"><label>Reminder Title</label><input type="text" id="famReminder" placeholder="e.g. Annual check-up"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="famDate"></div>
+      <div class="form-group"><label>Repeat</label><select id="famRepeat"><option>Once</option><option>Monthly</option><option>Yearly</option></select></div>
+      <button class="booking-btn" onclick="addFamilyMember()">Add Reminder</button>
+      <div class="booking-note">Family Circle is for reminders only. It does not require or expose another person's private medical records.</div>
+    </div>
+  </div>
+
+  <!-- ===== PINK PASSPORT ===== -->
+  <div class="section" id="sec-passport">
+  <div class="guest-lock-overlay" id="passportLock" style="display:none;">
+    <div class="guest-lock-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="guest-lock-title">Sign Up to Get Your Pink Passport</div>
+    <p class="guest-lock-msg">Your Pink Passport is created automatically when you create an account. Sign up to get your unique passport ID, earn Pink Points, and track your achievements.</p>
+    <button class="exam-btn" style="width:100%; max-width:260px;" onclick="handleLogout()">CREATE ACCOUNT</button>
+    <div style="margin-top:12px;"><a onclick="showSection('home')" style="font-size:13px; color:var(--text-light); cursor:pointer;">Back to Home</a></div>
+  </div>
+
+    <div class="section-title">Pink Passport</div>
+    <p class="section-sub">Your Indshi identity - presented by Indshi x India Turns Pink</p>
+    <div class="passport-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+        <div>
+          <div style="font-size:10px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">Pink Passport</div>
+          <div style="font-family:'Bricolage Grotesque'; font-size:22px; font-weight:700; margin-top:4px;" id="ppName">Indshi Member</div>
+          <div style="font-size:12px; opacity:0.85; margin-top:4px;">ID: ITP-2026-IND-001</div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:8px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Join Date</span><span>August 2026</span></div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Pink Points</span><span id="ppPoints">120</span></div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Gender</span><span>Female</span></div>
+      <div style="margin-top:12px;">
+        <div style="font-size:10px; opacity:0.7; margin-bottom:4px;">ACHIEVEMENTS</div>
+        <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:12px; font-size:11px; margin:2px;">Self-Check Pro</span>
+        <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:12px; font-size:11px; margin:2px;">First Spin</span>
+        <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:12px; font-size:11px; margin:2px;">Puzzle Master</span>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px; color:var(--text-light);">Every registered Indshi user automatically receives a digital Pink Passport. Open it from your profile to view your Indshi identity, achievements, and Pink Points balance.</p>
+    </div>
+  </div>
+
+  <!-- ===== PINK WALLET ===== -->
+  <div class="section" id="sec-wallet">
+  <div class="guest-lock-overlay" id="walletLock" style="display:none;">
+    <div class="guest-lock-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff0099" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="guest-lock-title">Sign Up to Access Pink Wallet</div>
+    <p class="guest-lock-msg">Your Pink Wallet tracks your Pink Points earned through games, challenges, and activities. Create an account to start earning and saving your rewards.</p>
+    <button class="exam-btn" style="width:100%; max-width:260px;" onclick="handleLogout()">CREATE ACCOUNT</button>
+    <div style="margin-top:12px;"><a onclick="showSection('home')" style="font-size:13px; color:var(--text-light); cursor:pointer;">Back to Home</a></div>
+  </div>
+
+    <div class="section-title">Pink Wallet</div>
+    <p class="section-sub">Your rewards and Pink Points balance</p>
+    <div class="passport-card" style="text-align:center;">
+      <div style="font-size:11px; opacity:0.8;">PINK WALLET BALANCE</div>
+      <div style="font-family:'Bricolage Grotesque'; font-size:42px; font-weight:800; margin:8px 0;" id="walletPoints">120</div>
+      <div style="font-size:13px; opacity:0.85;">Pink Points</div>
+    </div>
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:10px;">How to earn Pink Points</h4>
+      <div style="font-size:13px; color:var(--text); line-height:2;">
+        <div>Complete a Health Puzzle: +10 points</div>
+        <div>Daily Health Wheel spin: +5 points</div>
+        <div>Complete a Health Challenge: +50 points</div>
+        <div>Monthly self-check: +20 points</div>
+        <div>Refer a friend: +30 points</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:10px;">Redeem Points</h4>
+      <p style="font-size:13px; color:var(--text-light); line-height:1.5;">Use your Pink Points to shop eligible Pink products at the India Turns Pink Store.</p>
+      <button class="exam-btn" style="width:100%; margin-top:10px;" onclick="showToast('Store coming soon!')">Shop with Points</button>
+    </div>
+  </div>
+
+  <!-- ===== HEALTH CHALLENGES ===== -->
+  <div class="section" id="sec-challenges">
+    <div class="section-title">Health Challenges</div>
+    <p class="section-sub">Build sustainable everyday health habits</p>
+
+    <!-- Hydration Challenge -->
+    <div class="challenge-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px;">7-Day Hydration Challenge</h4>
+        <span style="font-size:12px; color:var(--text-light);" id="hydDayLabel">Day 1 of 7</span>
+      </div>
+      <p style="font-size:12px; color:var(--text-light); margin:4px 0;">Record your daily water intake</p>
+      <div style="text-align:center; margin:12px 0;">
+        <div style="font-size:14px; color:var(--text-light);">Today's Water</div>
+        <div style="font-size:28px; font-weight:800; color:var(--pink-deep); font-family:'Bricolage Grotesque';"><span id="hydGlasses">0</span> / 8 Glasses</div>
+        <button class="exam-btn secondary" style="width:auto; padding:8px 24px; margin-top:8px;" onclick="addGlass()">+ ADD GLASS</button>
+      </div>
+      <div class="challenge-progress-bar"><div class="challenge-progress-fill" id="hydProgress" style="width:0%;"></div></div>
+      <div class="challenge-day-row" id="hydDayRow"></div>
+      <div id="hydBadge" style="display:none; text-align:center; margin-top:8px;">
+        <div style="background:var(--green); color:#fff; padding:8px; border-radius:8px; font-size:13px; font-weight:600;">Challenge Completed! +50 Pink Points</div>
+      </div>
+    </div>
+
+    <!-- Sleep Challenge -->
+    <div class="challenge-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px;">7-Day Better Sleep Challenge</h4>
+        <span style="font-size:12px; color:var(--text-light);" id="sleepDayLabel">Day 1 of 7</span>
+      </div>
+      <p style="font-size:12px; color:var(--text-light); margin:4px 0;">Record your sleep each day</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0;">
+        <div class="form-group" style="margin:0;"><label style="font-size:12px;">Bedtime</label><input type="time" id="sleepBedtime"></div>
+        <div class="form-group" style="margin:0;"><label style="font-size:12px;">Wake-up</label><input type="time" id="sleepWake"></div>
+      </div>
+      <div style="text-align:center; font-size:13px; color:var(--text-light);" id="sleepDuration">Sleep: -</div>
+      <button class="exam-btn" style="width:100%; margin-top:8px;" onclick="saveSleepDay()">SAVE TODAY'S SLEEP</button>
+      <div class="challenge-progress-bar" style="margin-top:8px;"><div class="challenge-progress-fill" id="sleepProgress" style="width:0%;"></div></div>
+      <div class="challenge-day-row" id="sleepDayRow"></div>
+      <div id="sleepBadge" style="display:none; text-align:center; margin-top:8px;">
+        <div style="background:var(--green); color:#fff; padding:8px; border-radius:8px; font-size:13px; font-weight:600;">Challenge Completed! +50 Pink Points</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px;">
+      <p style="font-size:12px; color:var(--text-light);">Focus on sustainable everyday health habits. No competitive body or weight-loss challenges. Progress is saved to your account.</p>
+    </div>
+  </div>
+
+    <!-- ===== NOTIFICATION CENTRE ===== -->
+  <div class="section" id="sec-notifcenter">
+    <div class="section-title">Notification Centre</div>
+    <p class="section-sub">Manage your notification preferences</p>
+    <div class="notif-center-item">
+      <div class="notif-center-icon" style="background:var(--pink-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ff0099"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div style="flex:1;"><h5 style="font-size:14px; color:var(--text);">Period</h5><p style="font-size:11px; color:var(--text-light);">Your expected period is approaching</p></div>
+      <div class="notif-toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="notif-center-item">
+      <div class="notif-center-icon" style="background:var(--pink-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ff0099"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg></div>
+      <div style="flex:1;"><h5 style="font-size:14px; color:var(--text);">Challenges</h5><p style="font-size:11px; color:var(--text-light);">Day 5 of Hydration Challenge - record today</p></div>
+      <div class="notif-toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="notif-center-item">
+      <div class="notif-center-icon" style="background:var(--pink-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ff0099"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg></div>
+      <div style="flex:1;"><h5 style="font-size:14px; color:var(--text);">Family Circle</h5><p style="font-size:11px; color:var(--text-light);">Mom's annual check-up reminder is tomorrow</p></div>
+      <div class="notif-toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="notif-center-item">
+      <div class="notif-center-icon" style="background:var(--pink-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ff0099"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div style="flex:1;"><h5 style="font-size:14px; color:var(--text);">Health Arcade</h5><p style="font-size:11px; color:var(--text-light);">Your Health Wheel is ready to spin again</p></div>
+      <div class="notif-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+  </div>
+
+
+  <!-- ===== PROFILE SECTION ===== -->
+  <div class="section" id="sec-profile">
+    <div class="section-title">My Profile</div>
+    <div class="passport-card" id="profileCard">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+        <div>
+          <div style="font-size:10px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">Profile</div>
+          <div style="font-family:'Bricolage Grotesque'; font-size:22px; font-weight:700; margin-top:4px;" id="profileName">Guest User</div>
+          <div style="font-size:12px; opacity:0.85; margin-top:4px;" id="profileEmail">Not logged in</div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:8px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Gender</span><span id="profileGender">-</span></div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Date of Birth</span><span id="profileDob">-</span></div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Language</span><span id="profileLang">English</span></div>
+      <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:13px;"><span style="opacity:0.7;">Pink Points</span><span id="profilePoints">0</span></div>
+    </div>
+    <button class="exam-btn" style="width:100%; margin-bottom:10px;" onclick="showSection('passport')">View Pink Passport</button>
+    <button class="exam-btn secondary" style="width:100%; margin-bottom:10px;" onclick="showSection('wallet')">View Pink Wallet</button>
+    <button class="exam-btn" style="width:100%; background:#F44336; color:#fff;" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <!-- ===== STORIES ===== --> -->
+  <div class="section" id="sec-stories">
+    <div class="section-title">Survivor Stories</div>
+    <p class="section-sub">Real stories of hope and courage from breast cancer survivors</p>
+    <div class="story-card">
+      <div class="story-quote">"Early detection saved my life. I found a lump during self-examination and went for screening immediately. Today I am cancer-free and living every moment with gratitude."</div>
+      <div class="story-name">— Priya, Chennai</div>
+    </div>
+    <div class="story-card">
+      <div class="story-quote">"The breast cancer screening at an India Turns Pink camp was painless and quick. It detected an early-stage change. I am thankful for this movement reaching our village."</div>
+      <div class="story-name">— Lakshmi, Madurai</div>
+    </div>
+    <div class="story-card">
+      <div class="story-quote">"Survivor isn't just a word; it's my badge of courage. India Turns Pink gave me hope, support and a community that stood by me."</div>
+      <div class="story-name">— A Pink Warrior</div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px; color:var(--text-light);">Want to share your story? <a href="mailto:info@indiaturnspink.org" style="color:var(--pink-deep);">Email us</a></p>
+    </div>
+  </div>
+
+  <!-- ===== VOLUNTEER ===== -->
+  <div class="section" id="sec-volunteer">
+    <div class="section-title">Become a Volunteer</div>
+    <p class="section-sub">Join India's largest breast cancer awareness movement</p>
+    <div class="booking-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="volName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone / Email</label>
+        <input type="text" id="volContact" placeholder="Phone or email">
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input type="text" id="volCity" placeholder="Your city">
+      </div>
+      <div class="form-group">
+        <label>How would you like to help?</label>
+        <select id="volRole">
+          <option>Camp Support</option>
+          <option>Awareness Drive</option>
+          <option>Social Media</option>
+          <option>Community Outreach</option>
+          <option>Medical Professional</option>
+        </select>
+      </div>
+      <button class="booking-btn" onclick="submitVolunteer()">Join as Volunteer</button>
+    </div>
+  </div>
+
+  <!-- ===== AMBASSADOR ===== -->
+  <div class="section" id="sec-ambassador">
+    <div class="section-title">Become a Pink Ambassador</div>
+    <p class="section-sub">Lead the movement in your city, college or workplace</p>
+    <div class="card">
+      <p style="font-size:13px; color:var(--text-light); line-height:1.6;">
+        Pink Ambassadors are the heart of India Turns Pink. They organise awareness drives, screening camps and community events. As an ambassador you will:
+      </p>
+      <ul style="font-size:13px; color:var(--text); margin-top:8px; padding-left:20px; line-height:2;">
+        <li>Lead "Your City Turns Pink" campaigns</li>
+        <li>Organise college & workplace awareness</li>
+        <li>Connect women to free screening</li>
+        <li>Be recognised as a community health leader</li>
+      </ul>
+    </div>
+    <div class="booking-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="ambName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone / Email</label>
+        <input type="text" id="ambContact" placeholder="Phone or email">
+      </div>
+      <div class="form-group">
+        <label>City / Region</label>
+        <input type="text" id="ambCity" placeholder="Your city">
+      </div>
+      <div class="form-group">
+        <label>Organisation (College/Company)</label>
+        <input type="text" id="ambOrg" placeholder="Your college or company">
+      </div>
+      <button class="booking-btn" onclick="submitAmbassador()">Apply as Ambassador</button>
+    </div>
+  </div>
+
+  <!-- ===== PLEDGE ===== -->
+  <div class="section" id="sec-pledge">
+    <div class="section-title">Take the Pledge</div>
+    <p class="section-sub">Commit to regular breast cancer screening</p>
+    <div class="pledge-box">
+      <div class="pledge-count" id="pledgeCount2">10,247</div>
+      <p style="font-size:13px; opacity:0.9;">Women have taken the pledge</p>
+      <p style="font-size:14px; margin-top:12px; opacity:0.95;">"I pledge to examine my breasts regularly every month, attend screening camps, and spread awareness among my family and friends."</p>
+      <button class="pledge-btn" onclick="takePledge()">I Take the Pledge</button>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px;">10 Million Moms Initiative</h4>
+      <p style="font-size:13px; color:var(--text-light); margin-top:6px; line-height:1.5;">India Turns Pink aims to reach 10 million households through the "10 Million Moms" initiative. Your pledge brings us one step closer.</p>
+    </div>
+  </div>
+
+  <!-- ===== DONATE SECTION ===== -->
+  <div class="section" id="sec-donate">
+    <div class="donate-hero">
+      <h2>Donate & Save Lives</h2>
+      <p>No one should face breast cancer alone. Your contribution helps provide free screenings, awareness programs and care to thousands of women.</p>
+    </div>
+
+    <div class="indshi-card" style="margin-top:16px;">
+      <img class="indshi-img" src="indshi-character.png" alt="Indshi" style="width:80px; height:110px;">
+      <div class="indshi-card-text">
+        <h3>Give hope, give life</h3>
+        <p>Your donation can be her tomorrow. Even ₹365 can support a life-saving screening for a woman in need.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <label style="font-size:13px; font-weight:600; color:var(--pink-deep);">Choose Amount</label>
+      <div class="donate-amounts">
+        <div class="donate-amt active" onclick="selectAmt(this,365)">₹365<small>1 screening</small></div>
+        <div class="donate-amt" onclick="selectAmt(this,1000)">₹1000<small>3 screenings</small></div>
+        <div class="donate-amt" onclick="selectAmt(this,5000)">₹5000<small>15 screenings</small></div>
+        <div class="donate-amt" onclick="selectAmt(this,11000)">₹11000<small>Camp sponsor</small></div>
+      </div>
+      <button class="donate-btn" onclick="donateNow()">Donate Now</button>
+      <div class="donate-info">
+        🏦 Tax-deductible under 80G · Darpan ID: TN/2022/0320345<br>
+        💳 UPI / Card / Net Banking accepted<br>
+        📞 +91 9844052030 · info@indiaturnspink.org
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="font-family:'Bricolage Grotesque'; color:var(--pink-deep); font-size:15px; margin-bottom:8px;">Where your donation goes</h4>
+      <p style="font-size:13px; color:var(--text-light); line-height:1.6;">
+        ✅ Free breast cancer screening camps<br>
+        ✅ breast cancer screening devices for rural outreach<br>
+        ✅ Awareness & education programs<br>
+        ✅ Survivor support & counseling<br>
+        ✅ Mobile screening units
+      </p>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ========= CHAT FAB ========= -->
+<button class="chat-fab" onclick="openChat()">
+  <img src="indshi-character.png" alt="Indshi AI">
+  <div class="chat-fab-badge"></div>
+</button>
+
+<!-- ========= CHAT OVERLAY ========= -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-panel">
+    <div class="chat-header">
+      <img src="indshi-character.png" alt="Indshi">
+      <div>
+        <h4>Indshi AI</h4>
+        <small><span style="width:8px;height:8px;background:#4CAF50;border-radius:50%;display:inline-block;"></span> Online · Answers from Google</small>
+      </div>
+      <button class="close-chat" onclick="closeChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-bubble bot">
+        🌸 Namaste! I am <strong>Indshi</strong>, your AI assistant from India Turns Pink. I can answer your questions about breast cancer, self-examination, screening, and more. <em>All answers are sourced from Google.</em><br>How can I help you today?
+      </div>
+    </div>
+    <div class="chat-suggestions" id="chatSugs">
+      <button class="chat-sug" onclick="quickAsk('How to do breast self-examination?')">How to self-examine?</button>
+      <button class="chat-sug" onclick="quickAsk('What are breast cancer symptoms?')">Symptoms?</button>
+      <button class="chat-sug" onclick="quickAsk('How to book doorstep screening?')">Book screening</button>
+      <button class="chat-sug" onclick="quickAsk('How to donate to India Turns Pink?')">Donate</button>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask Indshi anything..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Event Registration Modal -->
+<div class="chat-overlay" id="eventOverlay" style="display:none;">
+  <div class="chat-panel" style="height:auto; max-height:80vh; border-radius:20px;">
+    <div class="chat-header">
+      <div>
+        <h4 id="eventTitle">Register for Event</h4>
+        <small>Fill in your details to register</small>
+      </div>
+      <button class="close-chat" onclick="closeEventReg()">×</button>
+    </div>
+    <div style="padding:20px; overflow-y:auto;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="evName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="evPhone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="evEmail" placeholder="Your email">
+      </div>
+      <div class="form-group">
+        <label>Number of Participants</label>
+        <input type="number" id="evCount" placeholder="e.g. 1" value="1">
+      </div>
+      <button class="booking-btn" onclick="submitEventReg()">Confirm Registration</button>
+      <div class="booking-note">You will receive a confirmation message on the provided phone/email with event details.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========= BOTTOM NAV (REDESIGNED) ========= -->
+<div class="bottom-nav-new">
+  <button class="nav-new-item active" onclick="showSection('home',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="nav-new-item" onclick="showSection('exam',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11V6a2 2 0 014 0v5M9 11h6a2 2 0 012 2v3a6 6 0 01-12 0v-3z"/></svg>
+    <span>Self Check</span>
+  </button>
+  <div class="nav-new-center" onclick="openChat()">
+    <img src="indshi-character.png" alt="Indshi">
+  </div>
+  <button class="nav-new-item" onclick="showSection('engage',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    <span>Resources</span>
+  </button>
+  <button class="nav-new-item" onclick="showSection('profile',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+    <span>Profile</span>
+  </button>
+</div>
+
+<script>
+// ====== SLIDE-OUT MENU ======
+function toggleMenu() {
+  var menu = document.getElementById('sideMenu');
+  var overlay = document.getElementById('menuOverlay');
+  menu.classList.toggle('show');
+  overlay.classList.toggle('show');
+}
+
+// ====== SPLASH ======
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('app').classList.add('show');
+  }, 3200);
+});
+
+// ====== PETALS ======
+(function() {
+  var bg = document.getElementById('petalsBg');
+  for (var i = 0; i < 15; i++) {
+    var p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 8) + 's';
+    p.style.animationDelay = (Math.random() * 8) + 's';
+    p.style.width = (12 + Math.random() * 15) + 'px';
+    p.style.height = p.style.width;
+    p.style.opacity = 0.3 + Math.random() * 0.4;
+    bg.appendChild(p);
+  }
+})();
+
+// ====== SECTIONS ======
+
+// ====== GUEST ACCESS CONTROL ======
+function isGuestUser() {
+  return guestMode === true;
+}
+
+function checkGuestAccess(sectionName) {
+  // These sections require a real account
+  var restricted = ['passport', 'wallet'];
+  if (restricted.indexOf(sectionName) >= 0 && isGuestUser()) {
+    // Show the lock overlay for this section
+    var lockId = sectionName + 'Lock';
+    var lockEl = document.getElementById(lockId);
+    if (lockEl) {
+      lockEl.style.display = 'block';
+      // Hide the rest of the section content
+      var section = document.getElementById('sec-' + sectionName);
+      if (section) {
+        var children = section.children;
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].id !== lockId) {
+            children[i].style.display = 'none';
+          }
+        }
+      }
+    }
+    return false; // Access denied
+  } else {
+    // Not a guest or not restricted - show all content
+    var section = document.getElementById('sec-' + sectionName);
+    if (section) {
+      var lockEl = section.querySelector('.guest-lock-overlay');
+      if (lockEl) lockEl.style.display = 'none';
+      var children = section.children;
+      for (var i = 0; i < children.length; i++) {
+        if (children[i].classList.contains('guest-lock-overlay')) {
+          children[i].style.display = 'none';
+        } else {
+          children[i].style.display = '';
+        }
+      }
+    }
+    return true; // Access granted
+  }
+}
+
+
+function showSection(name, navBtn) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  checkGuestAccess(name);
+  var sec = document.getElementById('sec-' + name);
+  if (!sec) sec = document.getElementById(name) ? document.getElementById(name) : document.querySelector('[id$="'+name+'"]');
+  // fallback
+  var map = {home:'sec-home',exam:'sec-exam',camps:'sec-camps',book:'sec-book',engage:'sec-engage',
+    donate:'sec-donate',stories:'sec-stories',volunteer:'sec-volunteer',ambassador:'sec-ambassador',pledge:'sec-pledge',
+    expert:'sec-expert',awareness:'sec-awareness',events:'sec-events',
+    live:'sec-live',arcade:'sec-arcade',puzzle:'sec-puzzle',wheel:'sec-wheel',
+    period:'sec-period',family:'sec-family',passport:'sec-passport',wallet:'sec-wallet',
+    challenges:'sec-challenges',notifcenter:'sec-notifcenter',riskquestion:'sec-riskquestion',profile:'sec-profile'};
+  var el = document.getElementById(map[name] || ('sec-'+name));
+  if (el) { el.classList.add('active'); }
+  window.scrollTo(0, 0);
+  if (navBtn) {
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    navBtn.classList.add('active');
+    document.querySelectorAll('.nav-new-item').forEach(function(n){ n.classList.remove('active'); });
+    navBtn.classList.add('active');
+  }
+}
+
+// ====== EXAM STEPS ======
+var examSteps = [
+  {title:'Step 1: Visual Check', desc:'Stand before a mirror with arms on hips. Look for any changes in size, shape, skin texture, dimpling, or nipple position. Raise arms and check again.'},
+  {title:'Step 2: In the Shower', desc:'With soapy hands, use your right hand to feel the left breast in circular motions. Check for lumps, thickening or changes. Repeat on the other side.'},
+  {title:'Step 3: Lying Down', desc:'Lie flat with a pillow under your right shoulder. Use the pads of your three middle fingers to feel your left breast in small circles. Vary pressure: light, medium, firm.'},
+  {title:'Step 4: Circular Pattern', desc:'Move in a circular or up-and-down pattern covering the entire breast from collarbone to bra line and armpit. Follow a systematic pattern so no area is missed.'},
+  {title:'Step 5: Check Nipples & Armpits', desc:'Gently squeeze each nipple to check for discharge. Also feel your armpits for any swollen lymph nodes. Report any unusual findings to a doctor immediately.'}
+];
+var examIdx = 0;
+function examNext() {
+  if (examIdx < examSteps.length-1) { examIdx++; updateExam(); }
+  else { showToast('✅ You completed all steps! Practice monthly.'); }
+}
+function examPrev() { if (examIdx > 0) { examIdx--; updateExam(); } }
+var examImages=['step1.png','step2.png','step3.png','step4.png','step5.png'];
+function updateExam() {
+  document.getElementById('examTitle').textContent = examSteps[examIdx].title;
+  document.getElementById('examDesc').textContent = examSteps[examIdx].desc;
+  document.getElementById('examImg').src = examImages[examIdx];
+  var dots = document.querySelectorAll('.exam-dot');
+  dots.forEach(function(d,i){ d.classList.toggle('active', i===examIdx); });
+}
+
+// ====== DONATE ======
+var donateAmount = 365;
+function selectAmt(el, amt) {
+  document.querySelectorAll('.donate-amt').forEach(function(d){ d.classList.remove('active'); });
+  el.classList.add('active');
+  donateAmount = amt;
+}
+function donateNow() {
+  // Opens the India Turns Pink donate page
+  showToast('Redirecting to secure donation page...');
+  setTimeout(function() {
+    window.open('https://pages.razorpay.com/donatetoindiaturnspink', '_blank');
+  }, 800);
+}
+
+// ====== BOOKING ======
+function submitBooking() {
+  var n = document.getElementById('bkName').value;
+  var p = document.getElementById('bkPhone').value;
+  if (!n || !p) { showToast('Please enter your name and phone'); return; }
+  showToast('✅ Booking received! India Turns Pink will call you soon.');
+  // Save locally
+  try { localStorage.setItem('itp_booking', JSON.stringify({name:n,phone:p,date:document.getElementById('bkDate').value,city:document.getElementById('bkCity').value})); } catch(e){}
+}
+function submitVolunteer() {
+  var n = document.getElementById('volName').value;
+  if (!n) { showToast('Please enter your name'); return; }
+  showToast('🎉 Thank you! Our team will contact you soon.');
+}
+function submitAmbassador() {
+  var n = document.getElementById('ambName').value;
+  if (!n) { showToast('Please enter your name'); return; }
+  showToast('🌟 Application received! We will be in touch.');
+}
+
+// ====== TALK TO EXPERT ======
+function bookExpert() {
+  var el = document.getElementById('exName');
+  if (el) { el.scrollIntoView({behavior:'smooth'}); el.focus(); }
+  else { showSection('expert'); }
+}
+function submitExpert() {
+  var n = document.getElementById('exName').value;
+  var p = document.getElementById('exPhone').value;
+  if (!n || !p) { showToast('Please enter your name and phone'); return; }
+  showToast('Consultation request received! Our specialist will call you within 24 hours.');
+  try { localStorage.setItem('indshi_expert_req', JSON.stringify({name:n,phone:p})); } catch(e){}
+}
+
+// ====== REQUEST AWARENESS PROGRAM ======
+function submitAwareness() {
+  var n = document.getElementById('awOrgName').value;
+  var c = document.getElementById('awContact').value;
+  if (!n || !c) { showToast('Please enter organisation name and contact'); return; }
+  showToast('Request received! Our team will contact you within 48 hours.');
+}
+
+// ====== PINK EVENTS REGISTRATION ======
+var currentEvent = '';
+function registerEvent(eventName) {
+  currentEvent = eventName;
+  document.getElementById('eventTitle').textContent = 'Register: ' + eventName;
+  var overlay = document.getElementById('eventOverlay');
+  overlay.style.display = 'flex';
+  overlay.classList.add('show');
+}
+function closeEventReg() {
+  var overlay = document.getElementById('eventOverlay');
+  overlay.classList.remove('show');
+  overlay.style.display = 'none';
+}
+function submitEventReg() {
+  var n = document.getElementById('evName').value;
+  var p = document.getElementById('evPhone').value;
+  if (!n || !p) { showToast('Please enter your name and phone'); return; }
+  showToast('Registered for ' + currentEvent + '! You will receive confirmation details soon.');
+  closeEventReg();
+}
+
+// ====== PLEDGE ======
+var pledged = false;
+function takePledge() {
+  if (pledged) { showToast('You already took the pledge! 🎀'); return; }
+  pledged = true;
+  var c = parseInt(document.getElementById('pledgeCount').textContent.replace(/,/g,''));
+  c++;
+  document.getElementById('pledgeCount').textContent = c.toLocaleString('en-IN');
+  var c2 = document.getElementById('pledgeCount2');
+  if (c2) c2.textContent = c.toLocaleString('en-IN');
+  showToast('🎀 Thank you for taking the pledge!');
+}
+
+// ====== SHARE ======
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({ title:'Indshi AI - India Turns Pink', text:'Check out this breast cancer awareness app!', url: window.location.href });
+  } else {
+    showToast('Share this link: ' + window.location.href);
+  }
+}
+
+// ====== CHAT (INDSHI AI - SOURCED FROM GOOGLE) ======
+function openChat() { document.getElementById('chatOverlay').classList.add('show'); }
+function closeChat() { document.getElementById('chatOverlay').classList.remove('show'); }
+
+// Curated knowledge base for common breast cancer questions
+var knowledgeBase = [
+  {keywords:['self','examination','exam','how to check','bse'], answer:'Here is how to perform a breast self-examination:\n\n1. <b>Visual Check:</b> Stand before a mirror, arms on hips. Look for changes in size, shape, skin, or nipples.\n2. <b>In the Shower:</b> Use circular motions with soapy hands to feel for lumps or thickening.\n3. <b>Lying Down:</b> Place a pillow under one shoulder, use the pads of 3 fingers in small circles with varying pressure.\n4. <b>Circular Pattern:</b> Cover the whole breast from collarbone to bra line and armpit.\n5. <b>Nipples & Armpits:</b> Check for discharge and swollen lymph nodes.\n\nPerform this <b>once every month</b>, ideally 3-5 days after your period. See the 3D animated guide in this app for visual steps!\n\n<a href="https://www.google.com/search?q=breast+self+examination+steps" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['symptom','sign','lump','pain','discharge','dimple'], answer:'Common symptoms of breast cancer include:\n\n• A <b>lump or thickening</b> in or near the breast or underarm\n• Change in breast <b>size or shape</b>\n• <b>Dimpling</b> or puckering of the skin\n• <b>Nipple discharge</b> (especially bloody)\n• Nipple turned inward (inverted)\n• <b>Redness</b> or scaly skin on the nipple or breast\n• <b>Persistent pain</b> in a specific area\n\n<b>Important:</b> Most breast lumps are NOT cancer, but any change should be checked by a doctor. Early detection has a 90%+ survival rate. Book a free screening through this app or call India Turns Pink at +91 9844052030.\n\n<a href="https://www.google.com/search?q=breast+cancer+symptoms" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['screening','ibreat','doorstep','book','test','mammogram'], answer:'India Turns Pink offers <b>free, painless, radiation-free</b> breast cancer screening using the <b>breast cancer screening device</b>:\n\n• Non-invasive — no discomfort\n• 100% radiation-free — safe for all ages\n• Instant results\n• Conducted by trained professionals\n\n<b>Two ways to get screened:</b>\n1. <b>Attend a screening camp</b> — see the Camps section for upcoming dates\n2. <b>Book doorstep screening</b> — tap "Book Now" on the Home screen and our team will visit your home\n\nYou can also call India Turns Pink at +91 9844052030.\n\n<a href="https://www.google.com/search?q=ibreat+device+breast+cancer+screening" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['donate','donation','contribute','support','money','fund'], answer:'Thank you for wanting to support India Turns Pink! 💖\n\nYour donation provides:\n• Free breast cancer screenings\n• breast cancer screening devices for rural outreach\n• Awareness & education programs\n• Survivor support\n\n<b>How to donate:</b>\n1. Tap the "Donate" section in the app\n2. Choose an amount (₹365 sponsors 1 screening)\n3. Or visit <a href="https://pages.razorpay.com/donatetoindiaturnspink" target="_blank">pages.razorpay.com/donatetoindiaturnspink</a>\n\nDonations are tax-deductible (80G). Darpan ID: TN/2022/0320345.\n\n<a href="https://www.google.com/search?q=india+turns+pink+donate" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['camp','schedule','event','when','where','next'], answer:'Upcoming India Turns Pink screening camps:\n\n📅 <b>Pinktober 2026</b> — Western Region Airports going Pink (October)\n📅 <b>Chennai Airport</b> — Free screening Oct 1-31\n📅 <b>Rural & Urban Mobile Camps</b> — Ongoing across India (K2K Drive)\n\nCheck the "Camps" section in the app for full details. Can\'t attend? Book a <b>doorstep screening</b> from the Home screen!\n\n<a href="https://www.google.com/search?q=india+turns+pink+screening+camp+schedule" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['india turns pink','itp','about','who','organisation','organization'], answer:'<b>India Turns Pink</b> is one of India\'s largest women\'s wellness movements dedicated exclusively to breast cancer awareness, early detection, screening, and prevention.\n\n• Founded in 2003 as "Chennai Turns Pink"\n• Transformed to "India Turns Pink" in 2016\n• Vision: <b>Breast Cancer Free India 2030</b>\n• Partners: Airports Authority of India (AAI), Kalyanmayee, Indian Oil (IOCL)\n• Programs: Free screening camps, Airports Turn Pink, Colleges Turn Pink, Village outreach, Survivor support\n\nContact: +91 9844052030 · info@indiaturnspink.org\n\n<a href="https://www.google.com/search?q=india+turns+pink+breast+cancer" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['prevent','prevention','risk','reduce','avoid'], answer:'Ways to reduce breast cancer risk:\n\n• <b>Monthly self-examination</b> — use the 3D guide in this app\n• <b>Regular screening</b> — book through this app or attend camps\n• <b>Maintain healthy weight</b>\n• <b>Exercise regularly</b> (30 min/day)\n• <b>Limit alcohol</b>\n• <b>Breastfeed</b> if possible\n• <b>Know your family history</b> — genetic testing if high risk\n• <b>Eat a balanced diet</b> — fruits, vegetables, whole grains\n• <b>Avoid smoking</b>\n\nEarly detection is the most powerful tool — when caught early, survival rates exceed 90%.\n\n<a href="https://www.google.com/search?q=breast+cancer+prevention+tips" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['volunteer','ambassador','join','member','help'], answer:'Join the India Turns Pink movement! 🤝\n\n<b>Become a Volunteer:</b> Help at screening camps, awareness drives, and community outreach.\n\n<b>Become a Pink Ambassador:</b> Lead the movement in your city, college, or workplace.\n\nTap the "Engage" section in the app to sign up. You can also:\n• Email: info@indiaturnspink.org\n• Call: +91 9844052030\n\n<a href="https://www.google.com/search?q=india+turns+pink+volunteer" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['age','when to start','how often','frequency'], answer:'<b>When to start screening:</b>\n\n• <b>Age 20-39:</b> Monthly self-examination + clinical breast exam every 3 years\n• <b>Age 40+:</b> Monthly self-exam + annual clinical exam + mammogram as advised\n• <b>High risk</b> (family history): Start earlier, consult your doctor\n\nPerform self-examination <b>once every month</b>, 3-5 days after your period ends.\n\n<a href="https://www.google.com/search?q=breast+cancer+screening+age+guidelines+india" target="_blank">📖 View more on Google →</a>'},
+  {keywords:['survivor','story','stories','cured','recovery'], answer:'India Turns Pink celebrates survivors — "Survivor isn\'t just a word; it\'s her badge of courage."\n\nRead inspiring survivor stories in the "Engage → Survivor Stories" section of this app. These stories of hope show that early detection truly saves lives.\n\nWant to share your story? Email info@indiaturnspink.org\n\n<a href="https://www.google.com/search?q=breast+cancer+survivor+stories+india" target="_blank">📖 View more on Google →</a>'}
+];
+
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMessage(msg, 'user');
+  document.getElementById('chatSugs').style.display = 'none';
+  
+  // Typing indicator
+  var typing = document.createElement('div');
+  typing.className = 'chat-typing';
+  typing.id = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  document.getElementById('chatMessages').appendChild(typing);
+  scrollChat();
+  
+  setTimeout(function() {
+    document.getElementById('typing').remove();
+    var answer = getAnswer(msg);
+    addMessage(answer, 'bot');
+  }, 1000 + Math.random() * 800);
+}
+
+function quickAsk(q) {
+  document.getElementById('chatInput').value = q;
+  sendChat();
+}
+
+function getAnswer(msg) {
+  var lower = msg.toLowerCase();
+  // Check knowledge base
+  for (var i = 0; i < knowledgeBase.length; i++) {
+    for (var j = 0; j < knowledgeBase[i].keywords.length; j++) {
+      if (lower.indexOf(knowledgeBase[i].keywords[j]) >= 0) {
+        return knowledgeBase[i].answer;
+      }
+    }
+  }
+  // Default: provide Google search link
+  return 'Let me find that for you on Google. 📖\n\nHere are the search results for your question:\n\n<a href="https://www.google.com/search?q=' + encodeURIComponent(msg + ' breast cancer') + '" target="_blank">🔍 Search Google: "' + msg + '" →</a>\n\nFor specific guidance from India Turns Pink, call +91 9844052030 or visit <a href="https://indiaturnspink.org" target="_blank">indiaturnspink.org</a>';
+}
+
+function addMessage(text, type) {
+  var div = document.createElement('div');
+  div.className = 'chat-bubble ' + type;
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  document.getElementById('chatMessages').appendChild(div);
+  scrollChat();
+}
+
+function scrollChat() {
+  var m = document.getElementById('chatMessages');
+  m.scrollTop = m.scrollHeight;
+}
+
+// ====== TOAST ======
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// ===== 10-DAY SELF CHECKUP NOTIFICATION =====
+function checkNotification() {
+  var lastCheck = localStorage.getItem('indshi_last_checkup');
+  var now = Date.now();
+  var tenDays = 10 * 24 * 60 * 60 * 1000; // 10 days in ms
+  if (!lastCheck || (now - parseInt(lastCheck)) >= tenDays) {
+    showNotificationToast();
+    localStorage.setItem('indshi_last_checkup', now.toString());
+  }
+}
+function showNotificationToast() {
+  var t = document.getElementById('notifToast');
+  if (t) { t.classList.add('show'); t.classList.remove('hide'); }
+}
+function dismissNotif() {
+  var t = document.getElementById('notifToast');
+  t.classList.remove('show');
+  t.classList.add('hide');
+  localStorage.setItem('indshi_last_checkup', Date.now().toString());
+}
+function startExamNow() {
+  dismissNotif();
+  showSection('exam');
+}
+// Check on app load
+setTimeout(checkNotification, 4000);
+
+// ====== MULTI-LANGUAGE ======
+var i18n = {
+  en: { home:'Home', selfcheck:'Self Check', resources:'Resources', profile:'Profile', donate:'Donate', live:'Indshi Live', arcade:'PLAY', period:'Period Tracker', challenges:'Challenges', family:'Family Circle', passport:'Pink Passport', wallet:'Pink Wallet' },
+  ta: { home:'முகப்பு', selfcheck:'சுய பரிசோதனை', resources:'வளங்கள்', profile:'சுயவிவரம்', donate:'நன்கொடை', live:'இந்தி லைவ்', arcade:'விளையாடு', period:'மாதவிடாய்', challenges:'சவால்கள்', family:'குடும்ப வட்டம்', passport:'பிங்க் பாஸ்போர்ட்', wallet:'பிங்க் பணப்பை' },
+  hi: { home:'होम', selfcheck:'स्वयं जांच', resources:'संसाधन', profile:'प्रोफाइल', donate:'दान', live:'इंडशी लाइव', arcade:'खेलें', period:'पीरियड ट्रैकर', challenges:'चुनौतियां', family:'परिवार', passport:'पिंक पासपोर्ट', wallet:'पिंक वॉलेट' }
+};
+var currentLang = 'en';
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  try { localStorage.setItem('indshi_lang', lang); } catch(e){}
+  var t = i18n[lang] || i18n.en;
+  document.querySelectorAll('.nav-new-item span').forEach(function(s) {
+    var txt = s.textContent.trim().toLowerCase();
+    if (txt === 'home') s.textContent = t.home;
+    if (txt === 'self check') s.textContent = t.selfcheck;
+    if (txt === 'resources') s.textContent = t.resources;
+    if (txt === 'profile') s.textContent = t.profile;
+  });
+  showToast('Language: ' + (lang==='ta'?'தமிழ்':lang==='hi'?'हिन्दी':'English'));
+}
+
+// ====== INDSHI LIVE - REAL TWO-WAY VOICE ======
+var liveActive = false, liveMuted = false, liveSpeaker = true;
+var liveRec = null, liveSpeaking = false, liveProcessing = false;
+var liveConversation = []; // Array of {speaker, text} objects
+
+function toggleLiveChat() {
+  if (!liveActive) {
+    startLiveChat();
+  } else {
+    pauseLiveChat();
+  }
+}
+
+function startLiveChat() {
+  liveActive = true;
+  liveSpeaking = false;
+  liveProcessing = false;
+  var btn = document.getElementById('liveMicBtn');
+  btn.classList.add('listening');
+  btn.classList.remove('speaking');
+  document.getElementById('liveStatus').textContent = 'Listening...';
+  document.getElementById('liveControls').style.display = 'flex';
+  document.getElementById('liveTranscript').innerHTML = '<div style="color:var(--pink-deep); padding:8px;">Indshi is listening... Speak now.</div>';
+
+  // Check for speech recognition support
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('liveTranscript').innerHTML = '<div style="color:#D32F2F; margin-bottom:8px;">Voice recognition is not supported in this browser. You can type your question below.</div><input type="text" id="liveTextInput" placeholder="Type your question..." style="width:100%; padding:10px; border-radius:8px; border:2px solid #f0d0e4; font-size:14px;"><button class="exam-btn" style="margin-top:8px;" onclick="sendLiveText()">Send</button>';
+    document.getElementById('liveStatus').textContent = 'Type your question';
+    return;
+  }
+
+  startListening();
+}
+
+function startListening() {
+  if (!liveActive || liveSpeaking || liveProcessing) return;
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  liveRec = new SR();
+  liveRec.lang = currentLang === 'ta' ? 'ta-IN' : currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+  liveRec.continuous = false;
+  liveRec.interimResults = true;
+
+  liveRec.onresult = function(event) {
+    var transcript = '';
+    for (var i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+
+    // Show what the user is saying in real time
+    if (!liveProcessing) {
+      updateLiveTranscript('user', transcript);
+    }
+
+    // When speech is finalized, process it
+    var lastIdx = event.results.length - 1;
+    if (event.results[lastIdx].isFinal) {
+      var finalText = event.results[lastIdx][0].transcript.trim();
+      if (finalText.length > 2 && !liveProcessing) {
+        liveProcessing = true;
+        processLiveQuery(finalText);
+      }
+    }
+  };
+
+  liveRec.onerror = function(event) {
+    console.log('Speech recognition error:', event.error);
+    if (event.error === 'no-speech' || event.error === 'aborted') {
+      // These are normal - just restart if still active
+      if (liveActive && !liveSpeaking && !liveProcessing) {
+        setTimeout(function() { try { startListening(); } catch(e) {} }, 300);
+      }
+    } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      document.getElementById('liveStatus').textContent = 'Microphone access denied. Please allow microphone permission in your browser settings.';
+      document.getElementById('liveMicBtn').classList.remove('listening');
+      liveActive = false;
+      document.getElementById('liveTranscript').innerHTML += '<div style="color:#D32F2F; padding:8px;">Microphone access was blocked. Please allow microphone permission and try again.</div><input type="text" id="liveTextInput" placeholder="Or type your question..." style="width:100%; padding:10px; border-radius:8px; border:2px solid #f0d0e4; font-size:14px; margin-top:8px;"><button class="exam-btn" style="margin-top:8px;" onclick="sendLiveText()">Send</button>';
+    } else {
+      document.getElementById('liveStatus').textContent = 'Error: ' + event.error + '. Tap mic to retry.';
+      document.getElementById('liveMicBtn').classList.remove('listening');
+      liveActive = false;
+    }
+  };
+
+  liveRec.onend = function() {
+    // Only restart if still active, not speaking, not processing
+    if (liveActive && !liveSpeaking && !liveProcessing) {
+      setTimeout(function() {
+        try { startListening(); } catch(e) {
+          console.log('Could not restart listening:', e);
+        }
+      }, 200);
+    }
+  };
+
+  try {
+    liveRec.start();
+  } catch(e) {
+    console.log('Could not start recognition:', e);
+    document.getElementById('liveStatus').textContent = 'Could not start microphone. Tap to retry.';
+    document.getElementById('liveMicBtn').classList.remove('listening');
+    liveActive = false;
+  }
+}
+
+function processLiveQuery(query) {
+  // Stop listening while we process
+  if (liveRec) { try { liveRec.stop(); } catch(e) {} }
+
+  liveSpeaking = true;
+  var btn = document.getElementById('liveMicBtn');
+  btn.classList.remove('listening');
+  btn.classList.add('speaking');
+  document.getElementById('liveStatus').textContent = 'Indshi is thinking...';
+
+  // Generate a helpful response
+  var response = generateLiveResponse(query);
+  var searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(query + ' breast cancer health');
+
+  // Show the response in the transcript
+  updateLiveTranscript('indshi', response);
+  appendSearchLink(searchUrl);
+
+  // Speak the response
+  speakResponse(response, function() {
+    // After speaking is done (or timeout), go back to listening
+    liveSpeaking = false;
+    liveProcessing = false;
+    btn.classList.remove('speaking');
+
+    if (liveActive) {
+      btn.classList.add('listening');
+      document.getElementById('liveStatus').textContent = 'Listening...';
+      setTimeout(function() {
+        startListening();
+      }, 300);
+    }
+  });
+}
+
+function speakResponse(text, callback) {
+  // Check if speech synthesis is available
+  if (!('speechSynthesis' in window) || !liveSpeaker) {
+    // No speech synthesis - just wait a moment then continue
+    document.getElementById('liveStatus').textContent = 'Indshi: ' + text.substring(0, 50) + '...';
+    setTimeout(callback, 2000);
+    return;
+  }
+
+  try {
+    // Cancel any existing speech
+    window.speechSynthesis.cancel();
+
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = currentLang === 'ta' ? 'ta-IN' : currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+    utter.rate = 0.95;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+
+    var spoken = false;
+
+    utter.onend = function() {
+      spoken = true;
+      callback();
+    };
+
+    utter.onerror = function(e) {
+      console.log('Speech synthesis error:', e);
+      spoken = true;
+      callback();
+    };
+
+    // Mobile browsers often fail to fire onend - add a timeout fallback
+    // Estimate duration: ~15 chars per second + 1 second base
+    var estimatedMs = Math.max(3000, (text.length / 15) * 1000 + 1000);
+    setTimeout(function() {
+      if (!spoken) {
+        console.log('Speech synthesis timeout - forcing callback');
+        spoken = true;
+        try { window.speechSynthesis.cancel(); } catch(e) {}
+        callback();
+      }
+    }, estimatedMs);
+
+    document.getElementById('liveStatus').textContent = 'Indshi is speaking...';
+
+    // Small delay before speaking (helps on mobile)
+    setTimeout(function() {
+      try {
+        window.speechSynthesis.speak(utter);
+      } catch(e) {
+        console.log('Could not speak:', e);
+        spoken = true;
+        callback();
+      }
+    }, 100);
+
+  } catch(e) {
+    console.log('Speech synthesis setup error:', e);
+    callback();
+  }
+}
+
+function updateLiveTranscript(speaker, text) {
+  var transcriptDiv = document.getElementById('liveTranscript');
+  var color = speaker === 'user' ? 'var(--text)' : 'var(--pink-deep)';
+  var label = speaker === 'user' ? 'You:' : 'Indshi:';
+
+  // Check if we're updating the last entry from the same speaker
+  var entries = transcriptDiv.querySelectorAll('.live-entry');
+  var lastEntry = entries[entries.length - 1];
+
+  if (lastEntry && lastEntry.getAttribute('data-speaker') === speaker) {
+    // Update existing entry
+    lastEntry.innerHTML = '<strong style="color:' + color + ';">' + label + '</strong> ' + text;
+  } else {
+    // Add new entry
+    var newEntry = document.createElement('div');
+    newEntry.className = 'live-entry';
+    newEntry.setAttribute('data-speaker', speaker);
+    newEntry.style.cssText = 'padding:8px 0; border-bottom:1px solid #f5f0f5; font-size:14px; line-height:1.5;';
+    newEntry.innerHTML = '<strong style="color:' + color + ';">' + label + '</strong> ' + text;
+    transcriptDiv.appendChild(newEntry);
+  }
+
+  // Scroll to bottom
+  transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+}
+
+function appendSearchLink(url) {
+  var transcriptDiv = document.getElementById('liveTranscript');
+  var link = document.createElement('div');
+  link.style.cssText = 'padding:4px 0; font-size:12px;';
+  link.innerHTML = '<a href="' + url + '" target="_blank" style="color:var(--pink-deep); text-decoration:underline;">Search Google for more info</a>';
+  transcriptDiv.appendChild(link);
+  transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+}
+
+function generateLiveResponse(query) {
+  var q = query.toLowerCase();
+  if (q.includes('self') && q.includes('exam')) {
+    return 'Breast self-examination should be done monthly. Check for lumps, changes in size or shape, skin dimpling, or nipple discharge. If you notice anything unusual, please consult a healthcare professional.';
+  }
+  if (q.includes('lump') || q.includes('pain')) {
+    return 'Breast lumps can be benign or concerning. Not all lumps are cancer, but any new lump should be evaluated by a qualified healthcare professional. I recommend scheduling a consultation.';
+  }
+  if (q.includes('screening') || q.includes('mammogram')) {
+    return 'Regular breast screening is recommended for women above 40. Monthly self-examination and annual clinical breast examination are important for early detection.';
+  }
+  if (q.includes('symptom')) {
+    return 'Common breast cancer symptoms include a lump, change in breast size or shape, skin dimpling, nipple discharge, or persistent pain. Early detection saves lives. Please consult a doctor if you notice any of these.';
+  }
+  if (q.includes('age') || q.includes('risk')) {
+    return 'Breast cancer risk increases with age, especially after 40. Regular screening and self-examination are the best tools for early detection. Talk to our expert for personalized guidance.';
+  }
+  if (q.includes('period') || q.includes('menstrual')) {
+    return 'Menstrual cycle changes are normal and can be tracked in the Period Tracker section. However, if you notice unusual changes, please consult a healthcare professional.';
+  }
+  if (q.includes('hello') || q.includes('hi') || q.includes('hey')) {
+    return 'Hello! I am Indshi, your breast health assistant. You can ask me about self-examination, breast cancer symptoms, screening, or any health concern. How can I help you today?';
+  }
+  if (q.includes('donate') || q.includes('contribute')) {
+    return 'You can donate to India Turns Pink through the Donate section. Your contribution helps spread breast cancer awareness and provide screening to those in need.';
+  }
+  if (q.includes('camp') || q.includes('screening camp')) {
+    return 'India Turns Pink organizes screening camps across India. Check the Screening Camps section for upcoming events near you.';
+  }
+  return 'I understand your concern about "' + query + '". For accurate medical guidance, I recommend consulting a qualified healthcare professional. You can also use Talk to Expert to book a consultation.';
+}
+
+function sendLiveText() {
+  var input = document.getElementById('liveTextInput');
+  if (!input || !input.value.trim()) return;
+  var q = input.value.trim();
+  input.value = '';
+  liveProcessing = true;
+  updateLiveTranscript('user', q);
+  processLiveQuery(q);
+}
+
+function toggleMute() {
+  liveMuted = !liveMuted;
+  document.getElementById('muteBtn').textContent = liveMuted ? 'Unmute' : 'Mute';
+  if (liveMuted) {
+    if (liveRec) { try { liveRec.stop(); } catch(e) {} }
+    document.getElementById('liveMicBtn').classList.remove('listening');
+    document.getElementById('liveStatus').textContent = 'Muted - tap Unmute to resume';
+  } else {
+    if (liveActive && !liveSpeaking && !liveProcessing) {
+      document.getElementById('liveMicBtn').classList.add('listening');
+      document.getElementById('liveStatus').textContent = 'Listening...';
+      startListening();
+    }
+  }
+}
+
+function toggleSpeaker() {
+  liveSpeaker = !liveSpeaker;
+  document.getElementById('speakerBtn').textContent = liveSpeaker ? 'Speaker On' : 'Speaker Off';
+  if (!liveSpeaker && 'speechSynthesis' in window) {
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+    if (liveSpeaking) {
+      liveSpeaking = false;
+      liveProcessing = false;
+      var btn = document.getElementById('liveMicBtn');
+      btn.classList.remove('speaking');
+      if (liveActive) {
+        btn.classList.add('listening');
+        document.getElementById('liveStatus').textContent = 'Listening...';
+        startListening();
+      }
+    }
+  }
+}
+
+function repeatAnswer() {
+  // Find the last Indshi response
+  var entries = document.querySelectorAll('#liveTranscript .live-entry');
+  for (var i = entries.length - 1; i >= 0; i--) {
+    if (entries[i].getAttribute('data-speaker') === 'indshi') {
+      var text = entries[i].textContent.replace('Indshi:', '').trim();
+      if (text) {
+        if ('speechSynthesis' in window) {
+          try { window.speechSynthesis.cancel(); } catch(e) {}
+          var utter = new SpeechSynthesisUtterance(text);
+          utter.lang = currentLang === 'ta' ? 'ta-IN' : currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+          utter.rate = 0.95;
+          window.speechSynthesis.speak(utter);
+          showToast('Repeating answer...');
+        } else {
+          showToast('Speech not available on this device');
+        }
+        return;
+      }
+    }
+  }
+  showToast('No previous answer to repeat');
+}
+
+function endLiveChat() {
+  liveActive = false;
+  liveSpeaking = false;
+  liveProcessing = false;
+  var btn = document.getElementById('liveMicBtn');
+  btn.classList.remove('listening', 'speaking');
+  document.getElementById('liveStatus').textContent = 'Conversation ended. Tap to start again.';
+  document.getElementById('liveControls').style.display = 'none';
+  if (liveRec) { try { liveRec.stop(); } catch(e) {} }
+  if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch(e) {} }
+}
+
+// ====== HEALTH PUZZLE ======
+var puzzles = [
+  { q: 'Which vitamin helps absorb calcium for bone health?', opts: ['Vitamin A','Vitamin D','Vitamin C','Vitamin B12','Iron','Zinc'], answer: 1 },
+  { q: 'How often should you do a breast self-examination?', opts: ['Daily','Weekly','Monthly','Yearly','Never','Bi-weekly'], answer: 2 },
+  { q: 'What is the recommended daily water intake?', opts: ['1 glass','2 glasses','8 glasses','15 glasses','20 glasses','3 glasses'], answer: 2 },
+  { q: 'Which fruit is rich in Vitamin C?', opts: ['Banana','Orange','Apple','Bread','Rice','Milk'], answer: 1 },
+  { q: 'What age should breast screening start for most women?', opts: ['18','25','30','40','50','60'], answer: 3 },
+];
+var currentPuzzle = 0, puzzleSelected = -1;
+function newPuzzle() {
+  currentPuzzle = Math.floor(Math.random() * puzzles.length);
+  puzzleSelected = -1;
+  var p = puzzles[currentPuzzle];
+  document.getElementById('puzzleQuestion').textContent = p.q;
+  var grid = document.getElementById('puzzleGrid');
+  grid.innerHTML = '';
+  p.opts.forEach(function(opt, i) {
+    var cell = document.createElement('div');
+    cell.className = 'puzzle-cell';
+    cell.textContent = opt;
+    cell.style.fontSize = '13px';
+    cell.onclick = function() { selectPuzzle(i); };
+    grid.appendChild(cell);
+  });
+  document.getElementById('puzzleResult').innerHTML = '';
+}
+function selectPuzzle(idx) {
+  if (puzzleSelected >= 0) return;
+  puzzleSelected = idx;
+  var cells = document.querySelectorAll('#puzzleGrid .puzzle-cell');
+  var p = puzzles[currentPuzzle];
+  cells[idx].classList.add('selected');
+  setTimeout(function() {
+    if (idx === p.answer) {
+      cells[idx].classList.remove('selected');
+      cells[idx].classList.add('matched');
+      document.getElementById('puzzleResult').innerHTML = '<div style="color:var(--green); font-weight:700; font-size:14px;">Correct! You earned 10 Pink Points!</div>';
+      addPinkPoints(10);
+    } else {
+      cells[idx].style.background = '#F44336';
+      cells[idx].style.color = '#fff';
+      cells[p.answer].classList.add('matched');
+      document.getElementById('puzzleResult').innerHTML = '<div style="color:#F44336; font-weight:600; font-size:14px;">Not quite. The answer was: ' + p.opts[p.answer] + '</div>';
+    }
+  }, 500);
+}
+
+// ====== HEALTH WHEEL ======
+var wheelFruits = [
+  { name: 'Apple', info: 'Apples are rich in fiber and support heart health.', tip: 'An apple a day can help maintain healthy cholesterol levels.' },
+  { name: 'Orange', info: 'Oranges are high in Vitamin C and boost immunity.', tip: 'Start your day with an orange for a natural energy boost.' },
+  { name: 'Guava', info: 'Guava is rich in Vitamin C and dietary fiber.', tip: 'Guava helps regulate blood sugar levels.' },
+  { name: 'Papaya', info: 'Papaya aids digestion and is rich in antioxidants.', tip: 'Papaya contains enzymes that support digestive health.' },
+  { name: 'Pomegranate', info: 'Pomegranate contains antioxidants and supports heart health.', tip: 'Pomegranate can be part of a balanced diet.' },
+  { name: 'Banana', info: 'Bananas are rich in potassium and provide quick energy.', tip: 'A banana before exercise provides sustained energy.' },
+];
+var wheelSpinning = false;
+function spinWheel() {
+  if (wheelSpinning) return;
+  var lastSpin = localStorage.getItem('indshi_wheel_spin');
+  var now = Date.now();
+  if (lastSpin && (now - parseInt(lastSpin)) < 86400000) {
+    var remaining = 86400000 - (now - parseInt(lastSpin));
+    var hrs = Math.floor(remaining / 3600000);
+    var mins = Math.floor((remaining % 3600000) / 60000);
+    showToast('Next spin available in ' + hrs + 'h ' + mins + 'm');
+    return;
+  }
+  wheelSpinning = true;
+  var result = Math.floor(Math.random() * 6);
+  var angle = 360 * 5 + (60 * result + 30);
+  var wheel = document.getElementById('healthWheel');
+  wheel.style.transform = 'rotate(' + angle + 'deg)';
+  setTimeout(function() {
+    wheelSpinning = false;
+    var f = wheelFruits[result];
+    var resultDiv = document.getElementById('wheelResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<h4>You got ' + f.name + '!</h4><p>' + f.info + '</p><p style="color:var(--pink-deep); font-weight:600;">Health Tip: ' + f.tip + '</p>';
+    localStorage.setItem('indshi_wheel_spin', now.toString());
+    addPinkPoints(5);
+    updateWheelCountdown();
+  }, 4500);
+}
+function updateWheelCountdown() {
+  var lastSpin = localStorage.getItem('indshi_wheel_spin');
+  if (!lastSpin) { document.getElementById('wheelCountdown').textContent = 'You can spin now!'; return; }
+  var now = Date.now();
+  var remaining = 86400000 - (now - parseInt(lastSpin));
+  if (remaining <= 0) {
+    document.getElementById('wheelCountdown').textContent = 'You can spin again now!';
+  } else {
+    var hrs = Math.floor(remaining / 3600000);
+    var mins = Math.floor((remaining % 3600000) / 60000);
+    document.getElementById('wheelCountdown').textContent = 'Next spin in ' + hrs + 'h ' + mins + 'm';
+  }
+}
+
+// ====== PERIOD TRACKER ======
+function savePeriod() {
+  var start = document.getElementById('periodStart').value;
+  var end = document.getElementById('periodEnd').value;
+  var cycle = document.getElementById('cycleLen').value || 28;
+  if (!start) { showToast('Please enter start date'); return; }
+  var data = { start:start, end:end, cycle:parseInt(cycle), symptoms:document.getElementById('periodSymptoms').value, mood:document.getElementById('periodMood').value, notes:document.getElementById('periodNotes').value };
+  try { localStorage.setItem('indshi_period', JSON.stringify(data)); } catch(e){}
+  // Calculate next period
+  var startDate = new Date(start);
+  var nextDate = new Date(startDate.getTime() + parseInt(cycle) * 86400000);
+  var today = new Date();
+  var diff = Math.ceil((nextDate - today) / 86400000);
+  if (diff < 0) diff = 0;
+  document.getElementById('periodCountdown').textContent = diff + ' days';
+  showToast('Period cycle saved');
+}
+
+// ====== FAMILY CIRCLE ======
+function addFamilyMember() {
+  var name = document.getElementById('famName').value;
+  var rel = document.getElementById('famRel').value;
+  var reminder = document.getElementById('famReminder').value;
+  var date = document.getElementById('famDate').value;
+  if (!name || !reminder) { showToast('Please enter name and reminder'); return; }
+  var emojis = { 'Mother':'👩', 'Father':'👨', 'Sister':'👧', 'Brother':'👦', 'Spouse':'💑', 'Daughter':'👧', 'Son':'👦', 'Other':'👤' };
+  var list = document.getElementById('familyList');
+  var div = document.createElement('div');
+  div.className = 'family-member';
+  var dateStr = date ? new Date(date).toLocaleDateString('en-IN', { day:'numeric', month:'long' }) : 'No date set';
+  div.innerHTML = '<div class="family-avatar">' + (emojis[rel] || '👤') + '</div><div class="family-info"><h5>' + name + ' (' + rel + ')</h5><p>' + reminder + '</p><p style="color:var(--pink-deep); font-size:11px;">Next reminder: ' + dateStr + '</p></div>';
+  list.appendChild(div);
+  document.getElementById('famName').value = '';
+  document.getElementById('famReminder').value = '';
+  document.getElementById('famDate').value = '';
+  showToast('Family reminder added');
+}
+
+// ====== PINK POINTS ======
+function addPinkPoints(pts) {
+  var current = parseInt(document.getElementById('pinkPoints').textContent) || 0;
+  current += pts;
+  document.getElementById('pinkPoints').textContent = current;
+  var w = document.getElementById('walletPoints');
+  if (w) w.textContent = current;
+  var pp = document.getElementById('ppPoints');
+  if (pp) pp.textContent = current;
+  try { localStorage.setItem('indshi_pink_points', current.toString()); } catch(e){}
+  if (pts > 0) showToast('You earned ' + pts + ' Pink Points!');
+}
+
+// ====== HEALTH CHALLENGES - ACCOUNT-BASED ======
+function initChallenges() {
+  var data = getUserData();
+  if (!data.hydration) data.hydration = { day: 1, glasses: [0,0,0,0,0,0,0] };
+  if (!data.sleep) data.sleep = { day: 1, records: [null,null,null,null,null,null,null] };
+  renderHydration(data.hydration);
+  renderSleep(data.sleep);
+}
+
+function renderHydration(hyd) {
+  var todayIdx = hyd.day - 1;
+  var todayGlasses = hyd.glasses[todayIdx] || 0;
+  var completedDays = hyd.glasses.filter(function(g) { return g >= 8; }).length;
+  var totalGlasses = hyd.glasses.reduce(function(a,b) { return a + b; }, 0);
+  
+  document.getElementById('hydDayLabel').textContent = 'Day ' + hyd.day + ' of 7';
+  document.getElementById('hydGlasses').textContent = todayGlasses;
+  document.getElementById('hydProgress').style.width = (todayGlasses / 8 * 100) + '%';
+  
+  var row = document.getElementById('hydDayRow');
+  row.innerHTML = '';
+  for (var i = 0; i < 7; i++) {
+    var d = document.createElement('div');
+    d.className = 'challenge-day';
+    if (hyd.glasses[i] >= 8) d.classList.add('done');
+    if (i === todayIdx) d.classList.add('today');
+    d.textContent = 'D' + (i+1);
+    row.appendChild(d);
+  }
+  
+  // Check if challenge completed
+  if (completedDays >= 7) {
+    document.getElementById('hydBadge').style.display = 'block';
+  }
+}
+
+function addGlass() {
+  var data = getUserData();
+  if (!data.hydration) data.hydration = { day: 1, glasses: [0,0,0,0,0,0,0] };
+  var todayIdx = data.hydration.day - 1;
+  if (data.hydration.glasses[todayIdx] < 8) {
+    data.hydration.glasses[todayIdx]++;
+    saveUserData({ hydration: data.hydration });
+    renderHydration(data.hydration);
+    addPinkPoints(1);
+    if (data.hydration.glasses[todayIdx] >= 8) {
+      showToast('Daily goal reached! +10 bonus points');
+      addPinkPoints(10);
+      // Advance to next day
+      if (data.hydration.day < 7) {
+        data.hydration.day++;
+        saveUserData({ hydration: data.hydration });
+        setTimeout(function() { renderHydration(data.hydration); }, 500);
+      }
+    }
+  } else {
+    showToast('Daily goal already reached!');
+  }
+}
+
+function renderSleep(slp) {
+  var todayIdx = slp.day - 1;
+  var completedDays = slp.records.filter(function(r) { return r !== null; }).length;
+  
+  document.getElementById('sleepDayLabel').textContent = 'Day ' + slp.day + ' of 7';
+  document.getElementById('sleepProgress').style.width = (completedDays / 7 * 100) + '%';
+  
+  var row = document.getElementById('sleepDayRow');
+  row.innerHTML = '';
+  for (var i = 0; i < 7; i++) {
+    var d = document.createElement('div');
+    d.className = 'challenge-day';
+    if (slp.records[i] !== null) d.classList.add('done');
+    if (i === todayIdx) d.classList.add('today');
+    d.textContent = 'D' + (i+1);
+    row.appendChild(d);
+  }
+  
+  // Show today's record if exists
+  var today = slp.records[todayIdx];
+  if (today) {
+    document.getElementById('sleepDuration').textContent = 'Sleep: ' + today.duration + ' (Saved)';
+  } else {
+    document.getElementById('sleepDuration').textContent = 'Sleep: -';
+  }
+  
+  if (completedDays >= 7) {
+    document.getElementById('sleepBadge').style.display = 'block';
+  }
+}
+
+function saveSleepDay() {
+  var bedtime = document.getElementById('sleepBedtime').value;
+  var wake = document.getElementById('sleepWake').value;
+  if (!bedtime || !wake) { showToast('Please enter bedtime and wake-up time'); return; }
+  
+  // Calculate duration
+  var bParts = bedtime.split(':');
+  var wParts = wake.split(':');
+  var bMin = parseInt(bParts[0]) * 60 + parseInt(bParts[1]);
+  var wMin = parseInt(wParts[0]) * 60 + parseInt(wParts[1]);
+  var diff = wMin - bMin;
+  if (diff < 0) diff += 24 * 60; // overnight
+  var hrs = Math.floor(diff / 60);
+  var mins = diff % 60;
+  var duration = hrs + 'h ' + mins + 'm';
+  
+  document.getElementById('sleepDuration').textContent = 'Sleep: ' + duration;
+  
+  var data = getUserData();
+  if (!data.sleep) data.sleep = { day: 1, records: [null,null,null,null,null,null,null] };
+  var todayIdx = data.sleep.day - 1;
+  data.sleep.records[todayIdx] = { bedtime: bedtime, wake: wake, duration: duration };
+  
+  // Advance day
+  if (data.sleep.day < 7) {
+    data.sleep.day++;
+  }
+  
+  saveUserData({ sleep: data.sleep });
+  renderSleep(data.sleep);
+  addPinkPoints(5);
+  showToast('Sleep recorded! +5 Pink Points');
+  
+  // Check completion
+  var completed = data.sleep.records.filter(function(r) { return r !== null; }).length;
+  if (completed >= 7) {
+    addPinkPoints(50);
+    showToast('Sleep Challenge completed! +50 bonus Pink Points!');
+  }
+  
+  // Clear inputs
+  document.getElementById('sleepBedtime').value = '';
+  document.getElementById('sleepWake').value = '';
+}
+
+// ====== RISK SNAPSHOT (after self-check) ======
+function showRiskResult(answered) {
+  var riskDiv = document.getElementById('riskResult');
+  var riskQ = document.getElementById('sec-riskquestion');
+  if (riskQ) riskQ.classList.remove('active');
+  riskDiv.style.display = 'block';
+  riskDiv.classList.add('section');
+  riskDiv.classList.add('active');
+  
+  var htmlContent = '';
+  if (answered === 'no') {
+    htmlContent = '<div class="section-title">Self-Check Result</div>';
+    htmlContent += '<div class="risk-snap-card risk-snap-green">';
+    htmlContent += '<div style="font-size:48px;">\u{1F7E2}</div>';
+    htmlContent += '<div class="risk-snap-label" style="color:#2E7D32;">NO CHANGE REPORTED</div>';
+    htmlContent += '<p class="risk-snap-msg">No unusual change was reported during this self-check. Continue regular breast awareness and appropriate health screening.</p>';
+    htmlContent += '<button class="exam-btn" style="width:100%; margin-top:12px;" onclick="showSection(\x27home\x27)">DONE</button>';
+    htmlContent += '<div class="risk-snap-disclaimer">Indshi Risk Snapshot is informational and is not a medical diagnosis.</div>';
+    htmlContent += '</div>';
+  } else {
+    htmlContent = '<div class="section-title">Self-Check Result</div>';
+    htmlContent += '<div class="risk-snap-card risk-snap-orange">';
+    htmlContent += '<div style="font-size:48px;">\u{1F7E0}</div>';
+    htmlContent += '<div class="risk-snap-label" style="color:#E65100;">CHANGE REPORTED</div>';
+    htmlContent += '<p class="risk-snap-msg">You reported noticing a change during your self-check. Many breast changes are not cancer, but a new or unusual change should be discussed with a qualified healthcare professional.</p>';
+    htmlContent += '<div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">';
+    htmlContent += '<button class="exam-btn" onclick="showSection(\x27expert\x27)">TALK TO EXPERT</button>';
+    htmlContent += '<button class="exam-btn secondary" onclick="openChat()">ASK INDSHI</button>';
+    htmlContent += '</div>';
+    htmlContent += '<button class="exam-btn" style="width:100%; margin-top:12px; opacity:0.7;" onclick="showSection(\x27home\x27)">DONE</button>';
+    htmlContent += '<div class="risk-snap-disclaimer">Indshi Risk Snapshot is informational and is not a medical diagnosis.</div>';
+    htmlContent += '</div>';
+  }
+  riskDiv.innerHTML = htmlContent;
+  
+  // Save self-check status to user account
+  saveUserData({ lastSelfCheck: new Date().toISOString(), selfCheckResult: answered });
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// ====== USER DATA LAYER (Firestore + localStorage fallback) ======
+var currentUser = null;
+var guestMode = false;
+
+function getUserData() {
+  if (guestMode) {
+    try { return JSON.parse(localStorage.getItem('indshi_guest_data') || '{}'); } catch(e) { return {}; }
+  }
+  if (currentUser && currentUser.data) return currentUser.data;
+  return {};
+}
+
+function saveUserData(updates) {
+  var data = getUserData();
+  for (var k in updates) { data[k] = updates[k]; }
+  if (guestMode) {
+    try { localStorage.setItem('indshi_guest_data', JSON.stringify(data)); } catch(e) {}
+    return;
+  }
+  if (currentUser) {
+    currentUser.data = data;
+    // Save to Firestore
+    if (db && firebaseReady) {
+      db.collection('users').doc(currentUser.uid).set(data, { merge: true })
+        .catch(function(e) { console.error('Save error:', e); });
+    }
+    // Also save to localStorage as backup
+    try { localStorage.setItem('indshi_user_' + currentUser.uid, JSON.stringify(data)); } catch(e) {}
+  }
+}
+
+function loadUserData(uid) {
+  return new Promise(function(resolve) {
+    if (db && firebaseReady) {
+      db.collection('users').doc(uid).get().then(function(doc) {
+        if (doc.exists) {
+          resolve(doc.data());
+        } else {
+          resolve({});
+        }
+      }).catch(function(e) {
+        console.error('Load error:', e);
+        // Fallback to localStorage
+        try {
+          var local = JSON.parse(localStorage.getItem('indshi_user_' + uid) || '{}');
+          resolve(local);
+        } catch(e) { resolve({}); }
+      });
+    } else {
+      // Fallback to localStorage
+      try {
+        var local = JSON.parse(localStorage.getItem('indshi_user_' + uid) || '{}');
+        resolve(local);
+      } catch(e) { resolve({}); }
+    }
+  });
+}
+
+// ====== AUTH HANDLERS ======
+function showLogin() {
+  document.getElementById('loginView').style.display = 'block';
+  document.getElementById('signupView').style.display = 'none';
+  document.getElementById('forgotView').style.display = 'none';
+  document.getElementById('authLoading').style.display = 'none';
+}
+
+function showSignup() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('signupView').style.display = 'block';
+  document.getElementById('forgotView').style.display = 'none';
+  document.getElementById('authLoading').style.display = 'none';
+}
+
+function showForgotPassword() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('signupView').style.display = 'none';
+  document.getElementById('forgotView').style.display = 'block';
+  document.getElementById('authLoading').style.display = 'none';
+}
+
+function showAuthLoading(text) {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('signupView').style.display = 'none';
+  document.getElementById('forgotView').style.display = 'none';
+  document.getElementById('authLoading').style.display = 'block';
+  document.getElementById('authLoadingText').textContent = text || 'Please wait...';
+}
+
+function showAuthError(view, msg) {
+  var el = document.getElementById(view + 'Error');
+  if (el) {
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(function() { el.classList.remove('show'); }, 5000);
+  }
+}
+
+function handleSignup() {
+  var name = document.getElementById('signupName').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  var pass = document.getElementById('signupPassword').value;
+  var confirm = document.getElementById('signupConfirm').value;
+  var gender = document.getElementById('signupGender').value;
+  var dob = document.getElementById('signupDob').value;
+  var mobile = document.getElementById('signupMobile').value.trim();
+  var lang = document.getElementById('signupLang').value;
+
+  // Validation
+  if (!name) { showAuthError('signup', 'Please enter your full name'); return; }
+  if (!email || email.indexOf('@') < 0) { showAuthError('signup', 'Please enter a valid email address'); return; }
+  if (!pass || pass.length < 6) { showAuthError('signup', 'Password must be at least 6 characters'); return; }
+  if (pass !== confirm) { showAuthError('signup', 'Passwords do not match'); return; }
+  if (!gender) { showAuthError('signup', 'Please select your gender'); return; }
+  if (!dob) { showAuthError('signup', 'Please enter your date of birth'); return; }
+
+  showAuthLoading('Creating your account...');
+
+  if (!firebaseReady || !auth) {
+    // Guest mode - store locally
+    setTimeout(function() {
+      var uid = 'local_' + btoa(email).replace(/=/g, '');
+      currentUser = {
+        uid: uid,
+        email: email,
+        data: {
+          fullName: name,
+          email: email,
+          gender: gender,
+          dob: dob,
+          mobile: mobile,
+          language: lang,
+          pinkPoints: 0,
+          passportId: 'ITP-2026-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+          joinDate: new Date().toISOString(),
+          challengeProgress: {},
+          selfCheckStatus: {},
+          lastLogin: new Date().toISOString()
+        }
+      };
+      saveUserData(currentUser.data);
+      completeLogin();
+    }, 1000);
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, pass).then(function(cred) {
+    var uid = cred.user.uid;
+    // Generate unique Pink Passport ID
+    var passportId = 'ITP-2026-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    var userData = {
+      fullName: name,
+      email: email,
+      gender: gender,
+      dob: dob,
+      mobile: mobile,
+      language: lang,
+      pinkPoints: 0,
+      passportId: passportId,
+      joinDate: new Date().toISOString(),
+      accountCreated: new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+    // Save to Firestore
+    db.collection('users').doc(uid).set(userData).then(function() {
+      currentUser = { uid: uid, email: email, data: userData };
+      completeLogin();
+    }).catch(function(e) {
+      showAuthLoading(null);
+      showLogin();
+      showAuthError('signup', 'Account created but data save failed: ' + e.message);
+    });
+  }).catch(function(e) {
+    showAuthLoading(null);
+    showSignup();
+    var msg = e.message || 'Signup failed';
+    if (e.code === 'auth/email-already-in-use') msg = 'An account with this email already exists. Please login.';
+    showAuthError('signup', msg);
+  });
+}
+
+function handleLogin() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var pass = document.getElementById('loginPassword').value;
+
+  if (!email) { showAuthError('login', 'Please enter your email'); return; }
+  if (!pass) { showAuthError('login', 'Please enter your password'); return; }
+
+  showAuthLoading('Signing in...');
+
+  if (!firebaseReady || !auth) {
+    // Guest mode - check local
+    setTimeout(function() {
+      var uid = 'local_' + btoa(email).replace(/=/g, '');
+      try {
+        var local = JSON.parse(localStorage.getItem('indshi_user_' + uid) || '{}');
+        if (local.fullName) {
+          currentUser = { uid: uid, email: email, data: local };
+          currentUser.data.lastLogin = new Date().toISOString();
+          saveUserData({ lastLogin: currentUser.data.lastLogin });
+          completeLogin();
+        } else {
+          showAuthLoading(null);
+          showLogin();
+          showAuthError('login', 'No account found. Please sign up first.');
+        }
+      } catch(e) {
+        showAuthLoading(null);
+        showLogin();
+        showAuthError('login', 'Login failed. Please try again.');
+      }
+    }, 800);
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, pass).then(function(cred) {
+    var uid = cred.user.uid;
+    loadUserData(uid).then(function(data) {
+      currentUser = { uid: uid, email: email, data: data || {} };
+      currentUser.data.lastLogin = new Date().toISOString();
+      saveUserData({ lastLogin: currentUser.data.lastLogin });
+      completeLogin();
+    });
+  }).catch(function(e) {
+    showAuthLoading(null);
+    showLogin();
+    var msg = e.message || 'Login failed';
+    if (e.code === 'auth/user-not-found') msg = 'No account found with this email. Please sign up.';
+    if (e.code === 'auth/wrong-password') msg = 'Incorrect password. Please try again.';
+    showAuthError('login', msg);
+  });
+}
+
+function handleForgotPassword() {
+  var email = document.getElementById('forgotEmail').value.trim();
+  if (!email || email.indexOf('@') < 0) { showAuthError('forgot', 'Please enter a valid email'); return; }
+
+  showAuthLoading('Sending reset link...');
+
+  if (!firebaseReady || !auth) {
+    setTimeout(function() {
+      showAuthLoading(null);
+      showLogin();
+      showToast('Password reset is not available in guest mode.');
+    }, 800);
+    return;
+  }
+
+  auth.sendPasswordResetEmail(email).then(function() {
+    showAuthLoading(null);
+    showLogin();
+    showToast('Password reset link sent to ' + email);
+  }).catch(function(e) {
+    showAuthLoading(null);
+    showForgotPassword();
+    showAuthError('forgot', e.message || 'Could not send reset link');
+  });
+}
+
+function handleLogout() {
+  if (auth) { auth.signOut(); }
+  currentUser = null;
+  guestMode = false;
+  document.getElementById('authScreen').style.display = 'flex';
+  showLogin();
+  showToast('Logged out successfully');
+}
+
+function guestLogin() {
+  guestMode = true;
+  // Ensure passport and wallet are locked for guests
+  checkGuestAccess('passport');
+  checkGuestAccess('wallet');
+  var guestData = getUserData();
+  if (!guestData.fullName) {
+    guestData = {
+      fullName: 'Guest User',
+      pinkPoints: 0,
+      passportId: 'ITP-GUEST-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+      joinDate: new Date().toISOString()
+    };
+    saveUserData(guestData);
+  }
+  currentUser = { uid: 'guest', email: '', data: guestData };
+  completeLogin();
+  showToast('Continuing as Guest. Sign up to save your data.');
+}
+
+function completeLogin() {
+  document.getElementById('authScreen').style.display = 'none';
+  // Restore passport and wallet content (in case they were locked)
+  checkGuestAccess('passport');
+  checkGuestAccess('wallet');
+  
+  // Update profile
+  var data = getUserData();
+  document.getElementById('profileName').textContent = data.fullName || 'User';
+  document.getElementById('profileEmail').textContent = currentUser ? currentUser.email : 'Guest';
+  document.getElementById('profileGender').textContent = data.gender || '-';
+  document.getElementById('profileDob').textContent = data.dob || '-';
+  document.getElementById('profileLang').textContent = (data.language === 'ta' ? 'Tamil' : data.language === 'hi' ? 'Hindi' : 'English');
+  
+  // Update Pink Passport
+  var pp = document.getElementById('ppName');
+  if (pp) pp.textContent = data.fullName || 'Indshi Member';
+  var ppId = document.querySelector('#sec-passport');
+  if (ppId) {
+    var idEl = ppId.querySelectorAll('div');
+    for (var i = 0; i < idEl.length; i++) {
+      if (idEl[i].textContent.indexOf('ITP-') === 0 || idEl[i].textContent.indexOf('ID:') === 0) {
+        idEl[i].innerHTML = 'ID: ' + (data.passportId || 'ITP-2026-IND-000');
+      }
+    }
+  }
+  
+  // Update Pink Points
+  var pts = data.pinkPoints || 0;
+  var pp1 = document.getElementById('pinkPoints');
+  if (pp1) pp1.textContent = pts;
+  var wp = document.getElementById('walletPoints');
+  if (wp) wp.textContent = pts;
+  var ppp = document.getElementById('ppPoints');
+  if (ppp) ppp.textContent = pts;
+  
+  // Init challenges with user data
+  initChallenges();
+  
+  // Set language from profile
+  if (data.language) {
+    var btns = document.querySelectorAll('.lang-btn');
+    btns.forEach(function(b) {
+      if ((data.language === 'ta' && b.textContent.includes('\u0BA4\u0BAE\u0BBF\u0BB4')) ||
+          (data.language === 'hi' && b.textContent.includes('\u0939\u093F\u0928\u094D\u0926\u0940')) ||
+          (data.language === 'en' && b.textContent === 'English')) {
+        b.click();
+      }
+    });
+  }
+  
+  // Load weather
+  loadWeather();
+  
+  // Go to home
+  showSection('home');
+}
+
+// ====== LIVE WEATHER (Open-Meteo API + Geolocation) ======
+function loadWeather() {
+  var weatherCard = document.querySelector('.weather-card');
+  if (!weatherCard) return;
+  
+  // Check if user has been asked before
+  var weatherAsked = localStorage.getItem('indshi_weather_asked');
+  
+  if (!weatherAsked) {
+    // First time - ask for permission
+    weatherCard.innerHTML = '<div style="width:100%; text-align:center; padding:8px;"><p style="font-size:13px; color:var(--text); margin-bottom:10px;">Allow Indshi to use your location to show local weather?</p><div style="display:flex; gap:8px; justify-content:center;"><button class="exam-btn" style="width:auto; padding:6px 16px;" onclick="grantWeatherLocation()">ALLOW LOCATION</button><button class="exam-btn secondary" style="width:auto; padding:6px 16px;" onclick="denyWeatherLocation()">NOT NOW</button></div></div>';
+    return;
+  }
+  
+  // Check if manual city is set
+  var manualCity = localStorage.getItem('indshi_weather_city');
+  if (manualCity) {
+    fetchWeatherByCity(manualCity);
+    return;
+  }
+  
+  // Try geolocation
+  if (navigator.geolocation) {
+    weatherCard.innerHTML = '<div style="width:100%; text-align:center; padding:8px;"><div class="auth-spinner"></div><p style="font-size:13px; color:var(--text-light);">Getting weather...</p></div>';
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
+      },
+      function(err) {
+        showManualCityOption();
+      },
+      { timeout: 10000 }
+    );
+  } else {
+    showManualCityOption();
+  }
+}
+
+function grantWeatherLocation() {
+  localStorage.setItem('indshi_weather_asked', '1');
+  loadWeather();
+}
+
+function denyWeatherLocation() {
+  localStorage.setItem('indshi_weather_asked', '1');
+  showManualCityOption();
+}
+
+function showManualCityOption() {
+  var weatherCard = document.querySelector('.weather-card');
+  if (!weatherCard) return;
+  weatherCard.innerHTML = '<div style="width:100%; text-align:center; padding:8px;"><p style="font-size:13px; color:var(--text); margin-bottom:8px;">Choose your city</p><select id="weatherCitySelect" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; font-size:13px;"><option value="">Select City</option><option>Chennai</option><option>Mumbai</option><option>Delhi</option><option>Bangalore</option><option>Kolkata</option><option>Hyderabad</option><option>Pune</option><option>Ahmedabad</option><option>Jaipur</option><option>Surat</option><option>Vizag</option><option>Madurai</option><option>Coimbatore</option></select><button class="exam-btn" style="width:100%; margin-top:8px;" onclick="setManualCity()">Set City</button></div>';
+}
+
+function setManualCity() {
+  var city = document.getElementById('weatherCitySelect').value;
+  if (!city) { showToast('Please select a city'); return; }
+  localStorage.setItem('indshi_weather_city', city);
+  fetchWeatherByCity(city);
+}
+
+function fetchWeatherByCoords(lat, lon) {
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true';
+  var weatherCard = document.querySelector('.weather-card');
+  
+  fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.current_weather) {
+      var cw = data.current_weather;
+      var temp = Math.round(cw.temperature);
+      var code = cw.weathercode;
+      var desc = weatherCodeToText(code);
+      var tip = weatherTip(temp, code);
+      
+      // Reverse geocode for city name
+      var geoUrl = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&zoom=10';
+      fetch(geoUrl, { headers: { 'Accept-Language': 'en' } }).then(function(r) { return r.json(); }).then(function(geo) {
+        var city = geo.address.city || geo.address.town || geo.address.village || geo.address.county || 'Your Location';
+        renderWeather(city, temp, desc, tip);
+      }).catch(function() {
+        renderWeather('Your Location', temp, desc, tip);
+      });
+    }
+  }).catch(function(e) {
+    weatherCard.innerHTML = '<div style="width:100%; text-align:center; padding:8px;"><p style="font-size:13px; color:#999;">Weather unavailable. <a onclick="showManualCityOption()" style="color:var(--pink-deep); cursor:pointer;">Choose city</a></p></div>';
+  });
+}
+
+function fetchWeatherByCity(city) {
+  // First geocode the city to get coordinates
+  var geoUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(city) + '&limit=1';
+  var weatherCard = document.querySelector('.weather-card');
+  
+  fetch(geoUrl).then(function(r) { return r.json(); }).then(function(geo) {
+    if (geo.length > 0) {
+      fetchWeatherByCoords(parseFloat(geo[0].lat), parseFloat(geo[0].lon));
+    } else {
+      renderWeather(city, 28, 'Partly Cloudy', 'Stay hydrated today.');
+    }
+  }).catch(function() {
+    renderWeather(city, 28, 'Partly Cloudy', 'Stay hydrated today.');
+  });
+}
+
+function renderWeather(city, temp, desc, tip) {
+  var weatherCard = document.querySelector('.weather-card');
+  if (!weatherCard) return;
+  var icon = weatherIcon(desc);
+  weatherCard.innerHTML = '<div class="weather-icon">' + icon + '</div><div class="weather-info"><div style="font-size:20px; font-weight:700; color:var(--text);">' + temp + '\u00B0C <span style="font-size:13px;color:var(--text-light)">' + desc + '</span></div><div style="font-size:12px; color:var(--text-light);">' + city + '</div><div style="font-size:11px; color:var(--pink-deep); margin-top:2px;">Today\u2019s Health Tip: ' + tip + '</div></div>';
+}
+
+function weatherCodeToText(code) {
+  if (code === 0) return 'Clear Sky';
+  if (code <= 3) return 'Partly Cloudy';
+  if (code <= 48) return 'Foggy';
+  if (code <= 67) return 'Rainy';
+  if (code <= 77) return 'Snowy';
+  if (code <= 82) return 'Showers';
+  if (code <= 99) return 'Thunderstorm';
+  return 'Partly Cloudy';
+}
+
+function weatherTip(temp, code) {
+  if (temp >= 35) return 'It\u2019s very hot. Stay hydrated and avoid direct sun.';
+  if (temp >= 30) return 'It\u2019s a hot day. Remember to stay hydrated.';
+  if (temp >= 20) return 'Pleasant weather. Great time for outdoor activity.';
+  if (temp >= 10) return 'Cool weather. Dress warmly.';
+  if (temp < 10) return 'Cold day. Keep warm and take care.';
+  return 'Stay healthy and hydrated today.';
+}
+
+function weatherIcon(desc) {
+  if (desc.includes('Clear')) return '\u2600\uFE0F';
+  if (desc.includes('Rain') || desc.includes('Shower')) return '\u{1F327}\uFE0F';
+  if (desc.includes('Thunder')) return '\u26C8\uFE0F';
+  if (desc.includes('Snow')) return '\u2744\uFE0F';
+  if (desc.includes('Fog')) return '\u{1F32B}\uFE0F';
+  return '\u26C5\uFE0F';
+}
+
+// ====== UPDATED PINK POINTS (account-based) ======
+function addPinkPoints(pts) {
+  var data = getUserData();
+  var current = data.pinkPoints || 0;
+  current += pts;
+  data.pinkPoints = current;
+  saveUserData({ pinkPoints: current });
+  
+  // Update UI
+  var pp = document.getElementById('pinkPoints');
+  if (pp) pp.textContent = current;
+  var wp = document.getElementById('walletPoints');
+  if (wp) wp.textContent = current;
+  var ppp = document.getElementById('ppPoints');
+  if (ppp) ppp.textContent = current;
+  var pp_profile = document.getElementById('profilePoints');
+  if (pp_profile) pp_profile.textContent = current;
+  
+  if (pts > 0) showToast('You earned ' + pts + ' Pink Points!');
+}
+
+// Init on load
+window.addEventListener('DOMContentLoaded', function() {
+  // Firebase is configured
+  
+  // Show auth screen after splash
+  setTimeout(function() {
+    // Check if user is already logged in
+    if (firebaseReady && auth) {
+      auth.onAuthStateChanged(function(user) {
+        if (user) {
+          loadUserData(user.uid).then(function(data) {
+            currentUser = { uid: user.uid, email: user.email, data: data || {} };
+            completeLogin();
+          });
+        } else {
+          document.getElementById('authScreen').style.display = 'flex';
+          showLogin();
+        }
+      });
+    } else {
+      // No Firebase - show login screen
+      document.getElementById('authScreen').style.display = 'flex';
+      showLogin();
+    }
+  }, 3000);
+  
+  // Init puzzle
+  newPuzzle();
+  updateWheelCountdown();
+  
+  // Update wheel countdown every minute
+  setInterval(updateWheelCountdown, 60000);
+});
+
+
+</script>
+
+<div id="notifToast" class="notif-toast">
+  <div class="notif-content">
+    <div class="notif-icon-box">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C8 2 6 5 6 8c0 1.5.5 2.8 1.3 3.8L4 14l4 2-1 4 5-3 5 3-1-4 4-2-3.3-2.2C17.5 10.8 18 9.5 18 8c0-3-2-6-6-6z"/></svg>
+    </div>
+    <div class="notif-text">
+      <div class="notif-title">Time for your monthly self-check!</div>
+      <div class="notif-desc">It has been 10 days since your last self-examination. Early detection saves lives.</div>
+      <div class="notif-actions">
+        <button class="notif-btn-primary" onclick="startExamNow()">Start Now</button>
+        <button class="notif-btn-secondary" onclick="dismissNotif()">Remind me later</button>
+      </div>
+    </div>
+    <button class="notif-close" onclick="dismissNotif()">&times;</button>
+  </div>
+</div>
+
+</body>
+</html>
